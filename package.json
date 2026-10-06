@@ -1,6 +1,6 @@
 {
   "name": "@alllexey/ui",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Material 3 Expressive design system for alllexey.dev projects: tokens, CSS components, web components and Svelte 5 components.",
   "license": "MIT",
   "type": "module",

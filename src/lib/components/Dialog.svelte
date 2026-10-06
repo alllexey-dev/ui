@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
+  import { lockScroll } from "../scroll-lock.js";
   import type { ShapeName } from "../shapes.js";
   import Icon from "./Icon.svelte";
   import Shape from "./Shape.svelte";
@@ -37,7 +38,11 @@
     const previous = document.activeElement as HTMLElement | null;
     // Let an autofocus field inside take focus first; otherwise focus the dialog itself.
     queueMicrotask(() => box.contains(document.activeElement) || box.focus());
-    return () => previous?.focus?.();
+    const unlock = lockScroll();
+    return () => {
+      unlock();
+      previous?.focus?.();
+    };
   });
 </script>
 

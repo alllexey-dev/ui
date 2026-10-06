@@ -2,6 +2,7 @@
   import uPlot from "uplot";
   import "uplot/dist/uPlot.min.css";
   import { onMount, untrack } from "svelte";
+  import { chartRange } from "../chart-range.js";
   import { cssVar } from "../theme/index.js";
 
   /** color is a CSS custom property, e.g. "--md-primary". */
@@ -12,6 +13,7 @@
     values,
     height = 180,
     format = (v: number) => v.toFixed(0),
+    min,
     max,
     withDate = false,
   }: {
@@ -20,6 +22,8 @@
     values: number[][];
     height?: number;
     format?: (v: number) => string;
+    /** Pins the bottom of the y axis; by default it is 0, or below the lowest value when there are negatives. */
+    min?: number;
     max?: number;
     withDate?: boolean;
   } = $props();
@@ -38,7 +42,7 @@
       padding: [8, 4, 0, 0],
       cursor: { points: { size: 9, width: 3 }, y: false, drag: { x: false, y: false } },
       legend: { show: false },
-      scales: { x: { time: true }, y: { range: (_u, _min, dataMax) => [0, max ?? Math.max(dataMax * 1.15, 1)] } },
+      scales: { x: { time: true }, y: { range: (_u, dataMin, dataMax) => chartRange(dataMin, dataMax, { min, max }) } },
       axes: [
         { ...axis, space: withDate ? 110 : 80, values: (_u, ticks) => ticks.map(clock) },
         { ...axis, size: 60, values: (_u, ticks) => ticks.map((v) => format(v)) },
@@ -50,10 +54,28 @@
           stroke: cssVar(s.color),
           width: i === 0 ? 2.5 : 2,
           fill: i === 0 ? cssVar(s.color) + "22" : undefined,
+          fillTo: 0,
           points: { show: false },
         })),
       ],
       hooks: {
+        // Zero line when the data crosses it (returns, balances and other signed values).
+        draw: [
+          (u) => {
+            const [bottom, top] = [u.scales.y.min ?? 0, u.scales.y.max ?? 0];
+            if (!(bottom < 0 && top > 0)) return;
+            const y = Math.round(u.valToPos(0, "y", true)) + 0.5;
+            const ctx = u.ctx;
+            ctx.save();
+            ctx.strokeStyle = cssVar("--md-outline");
+            ctx.lineWidth = devicePixelRatio;
+            ctx.beginPath();
+            ctx.moveTo(u.bbox.left, y);
+            ctx.lineTo(u.bbox.left + u.bbox.width, y);
+            ctx.stroke();
+            ctx.restore();
+          },
+        ],
         setCursor: [
           (u) => {
             const idx = u.cursor.idx;

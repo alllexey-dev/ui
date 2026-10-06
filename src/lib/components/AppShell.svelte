@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
+  import { lockScroll } from "../scroll-lock.js";
   import type { ThemeStore } from "../theme/store.svelte.js";
   import Icon from "./Icon.svelte";
   import ThemeSettings from "./ThemeSettings.svelte";
@@ -42,6 +43,32 @@
   let settings = $state(false);
   const heading = $derived(title ?? items.find((i) => i.active)?.label ?? brand);
 
+  // Drawer on phones: the page behind it does not scroll, and a swipe to the left closes it.
+  let dragX = $state(0);
+  let swipe: { x: number; y: number; horizontal: boolean | null } | null = null;
+
+  $effect(() => {
+    if (drawer) return lockScroll();
+  });
+
+  function swipeStart(e: TouchEvent) {
+    if (drawer) swipe = { x: e.touches[0].clientX, y: e.touches[0].clientY, horizontal: null };
+  }
+
+  function swipeMove(e: TouchEvent) {
+    if (!swipe) return;
+    const dx = e.touches[0].clientX - swipe.x;
+    const dy = e.touches[0].clientY - swipe.y;
+    swipe.horizontal ??= Math.abs(dx) > 8 || Math.abs(dy) > 8 ? Math.abs(dx) > Math.abs(dy) : null;
+    if (swipe.horizontal) dragX = Math.min(0, dx);
+  }
+
+  function swipeEnd() {
+    if (swipe?.horizontal && dragX < -72) drawer = false;
+    swipe = null;
+    dragX = 0;
+  }
+
   function toggleRail() {
     expanded = !expanded;
     localStorage.setItem(storageKey, String(expanded));
@@ -51,7 +78,17 @@
 <svelte:window onkeydown={(e) => e.key === "Escape" && (drawer = false)} onhashchange={() => (drawer = false)} onpopstate={() => (drawer = false)} />
 
 <div class="shell" class:expanded>
-  <aside class="rail" class:open={drawer} aria-label="Навигация">
+  <aside
+    class="rail"
+    class:open={drawer}
+    class:dragging={dragX !== 0}
+    style:transform={dragX ? `translateX(${dragX}px)` : undefined}
+    aria-label="Навигация"
+    ontouchstart={swipeStart}
+    ontouchmove={swipeMove}
+    ontouchend={swipeEnd}
+    ontouchcancel={swipeEnd}
+  >
     <div class="rail-top">
       <button class="m3-icon-btn menu-btn" onclick={toggleRail} aria-label={expanded ? "Свернуть меню" : "Развернуть меню"}><Icon name="menu" /></button>
       <button class="m3-icon-btn close-btn" onclick={() => (drawer = false)} aria-label="Закрыть меню"><Icon name="close" /></button>
@@ -100,10 +137,14 @@
 {#if settings && theme}<ThemeSettings {theme} onclose={() => (settings = false)} />{/if}
 
 <style>
-  .shell { display: grid; grid-template-columns: 96px minmax(0, 1fr); min-height: 100vh; transition: grid-template-columns 0.45s var(--md-spring-default); }
+  .shell { display: grid; grid-template-columns: 96px minmax(0, 1fr); min-height: 100vh; min-height: 100dvh; transition: grid-template-columns 0.45s var(--md-spring-default); }
   .shell.expanded { grid-template-columns: 240px minmax(0, 1fr); }
 
-  .rail { position: sticky; top: 0; height: 100vh; display: flex; flex-direction: column; gap: 4px; padding: 12px 12px 16px; background: var(--md-surface); overflow-y: auto; overflow-x: hidden; z-index: 20; }
+  .rail {
+    position: sticky; top: 0; height: 100vh; height: 100dvh; display: flex; flex-direction: column; gap: 4px;
+    padding: 12px 12px calc(16px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));
+    background: var(--md-surface); overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; z-index: 20;
+  }
   .rail > * { flex-shrink: 0; }
   .rail-top { display: flex; align-items: center; gap: 8px; height: 56px; padding-left: 16px; }
   .close-btn { display: none; }
@@ -120,7 +161,8 @@
   .item:focus-visible .indicator { outline: 3px solid var(--md-secondary); outline-offset: 2px; }
   .indicator { position: relative; isolation: isolate; display: grid; place-items: center; width: 56px; height: 32px; border-radius: var(--md-shape-full); transition: background 0.3s, width 0.45s var(--md-spring-fast); }
   .indicator::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: var(--md-on-surface); opacity: 0; z-index: -1; transition: opacity 0.15s; }
-  .item:hover .indicator::before { opacity: 0.08; }
+  @media (hover: hover) { .item:hover .indicator::before { opacity: 0.08; } }
+  .item:active .indicator::before { opacity: 0.12; }
   .item.active { color: var(--md-on-surface); }
   .item.active .indicator { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
   .label { white-space: nowrap; }
@@ -136,7 +178,7 @@
   .expanded .rail :global(.rail-text) { opacity: 1; }
 
   .body { min-width: 0; display: flex; flex-direction: column; }
-  .topbar { display: none; align-items: center; gap: 8px; height: 64px; padding: 0 8px; position: sticky; top: 0; z-index: 10; background: var(--md-surface); }
+  .topbar { display: none; align-items: center; gap: 8px; height: calc(64px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) max(8px, env(safe-area-inset-right)) 0 max(8px, env(safe-area-inset-left)); position: sticky; top: 0; z-index: 10; background: var(--md-surface); }
   .spacer { flex: 1; }
   main { position: relative; flex: 1; min-width: 0; background: var(--md-surface-container-lowest); border-radius: var(--md-shape-xl) 0 0 0; margin-top: 12px; }
   :global([data-theme="dark"]) main { background: var(--md-surface-container-low); }
@@ -157,8 +199,9 @@
     .shell, .shell.expanded { grid-template-columns: 1fr; }
     .topbar { display: flex; }
     main { margin-top: 0; border-radius: var(--md-shape-xl) var(--md-shape-xl) 0 0; }
-    .rail { position: fixed; left: 0; top: 0; bottom: 0; width: 300px; transform: translateX(-105%); transition: transform 0.45s var(--md-spring-default); border-radius: 0 var(--md-shape-lg) var(--md-shape-lg) 0; background: var(--md-surface-container-low); }
+    .rail { position: fixed; left: 0; top: 0; bottom: 0; width: min(300px, 85vw); padding-top: calc(12px + env(safe-area-inset-top)); transform: translateX(-105%); transition: transform 0.45s var(--md-spring-default); border-radius: 0 var(--md-shape-lg) var(--md-shape-lg) 0; background: var(--md-surface-container-low); }
     .rail.open { transform: none; box-shadow: var(--md-elevation-3); }
+    .rail.dragging { transition: none; }
     .rail .item { flex-direction: row; }
     .rail .indicator { width: 100%; height: 56px; justify-content: flex-start; padding-left: 16px; display: flex; align-items: center; }
     .rail .item .label { position: absolute; left: 56px; font: var(--md-label-large); }

@@ -57,7 +57,8 @@
   .setting { display: flex; flex-direction: column; gap: 10px; }
   .swatches { display: flex; flex-wrap: wrap; gap: 8px; }
   .swatch { border: none; background: none; padding: 0; position: relative; cursor: pointer; transition: transform 0.35s var(--md-spring-fast); }
-  .swatch:hover { transform: scale(1.08); }
+  @media (hover: hover) { .swatch:hover { transform: scale(1.08); } }
+  .swatch:active { transform: scale(0.94); }
   .swatch:focus-visible { outline: 3px solid var(--md-secondary); outline-offset: 2px; border-radius: 50%; }
   .custom input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
   .chips { display: flex; flex-wrap: wrap; gap: 8px; }

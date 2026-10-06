@@ -1,7 +1,7 @@
 // Framework-free custom elements for pages without Svelte (cringetrader, static sites):
 // <m3-shape>, <m3-loading-indicator> and <m3-progress>. Importing this module registers them.
 import { clipPath, shapeNames, type ShapeName } from "../shapes.js";
-import { wavePath } from "../wave.js";
+import { createFollower, progressGeometry } from "../progress.js";
 
 const isShape = (value: string | null): value is ShapeName => !!value && (shapeNames as string[]).includes(value);
 const number = (value: string | null, fallback: number) => (value !== null && Number.isFinite(Number(value)) ? Number(value) : fallback);
@@ -122,19 +122,20 @@ export class M3Progress extends Base {
   static css = `
     :host { display: block; width: 100%; }
     svg { display: block; overflow: visible; }
-    path { transition: d 0.5s var(--md-spring-default); }
   `;
   #svg: SVGSVGElement;
   #track: SVGLineElement;
   #stop: SVGCircleElement;
   #active: SVGPathElement;
   #resize: ResizeObserver;
+  #follower = createFollower((shown) => this.#draw(shown));
+  #shown = 0;
 
   constructor() {
     super();
     const root = this.attachShadow({ mode: "open" });
     root.adoptedStyleSheets = [sheet(M3Progress.css)];
-    this.#resize = new ResizeObserver(() => this.#render());
+    this.#resize = new ResizeObserver(() => this.#draw(this.#shown));
     this.#svg = document.createElementNS(SVG, "svg");
     this.#track = document.createElementNS(SVG, "line");
     this.#stop = document.createElementNS(SVG, "circle");
@@ -150,43 +151,48 @@ export class M3Progress extends Base {
     this.setAttribute("aria-valuemin", "0");
     this.setAttribute("aria-valuemax", "100");
     this.#resize.observe(this);
-    this.#render();
+    this.#update();
   }
 
   disconnectedCallback() {
     this.#resize.disconnect();
+    this.#follower.stop();
   }
 
   attributeChangedCallback() {
-    this.#render();
+    this.#update();
   }
 
-  #render() {
-    const width = this.clientWidth;
+  #fraction(): number {
     const max = number(this.getAttribute("max"), 100);
-    const fraction = max > 0 ? Math.min(1, Math.max(0, number(this.getAttribute("value"), 0) / max)) : 0;
-    const wave = !this.hasAttribute("flat");
+    return max > 0 ? Math.min(1, Math.max(0, number(this.getAttribute("value"), 0) / max)) : 0;
+  }
+
+  #update() {
+    const fraction = this.#fraction();
+    this.setAttribute("aria-valuenow", String(Math.round(fraction * 100)));
+    this.#follower.set(fraction);
+    this.#draw(this.#shown);
+  }
+
+  #draw(shown: number) {
+    this.#shown = shown;
+    const width = this.clientWidth;
     const thickness = number(this.getAttribute("thickness"), 4);
-    const height = thickness + (wave ? 8 : 0);
-    const mid = height / 2;
+    const g = progressGeometry(shown, width, thickness, !this.hasAttribute("flat"));
     const tone = this.getAttribute("tone") || "primary";
     const color = `var(--md-${tone})`;
     const trackColor = tone === "primary" ? "var(--md-secondary-container)" : `var(--md-${tone}-container)`;
-    this.setAttribute("aria-valuenow", String(Math.round(fraction * 100)));
-    this.style.height = `${height}px`;
+    this.style.height = `${g.height}px`;
     this.#svg.setAttribute("width", String(width));
-    this.#svg.setAttribute("height", String(height));
-    if (!width) return;
-
-    const activeEnd = fraction * width;
-    const trackStart = fraction > 0 ? activeEnd + 4 + thickness / 2 : thickness / 2;
-    const showTrack = trackStart < width - thickness / 2;
-    this.#track.style.display = this.#stop.style.display = showTrack ? "" : "none";
-    for (const [k, v] of Object.entries({ x1: trackStart, x2: width - thickness / 2, y1: mid, y2: mid, stroke: trackColor, "stroke-width": thickness })) this.#track.setAttribute(k, String(v));
-    for (const [k, v] of Object.entries({ cx: width - thickness / 2, cy: mid, r: thickness / 2, fill: color })) this.#stop.setAttribute(k, String(v));
-    const d = activeEnd >= thickness ? wavePath(thickness / 2, activeEnd - thickness / 2, mid, wave ? 3 : 0) : "";
-    this.#active.style.display = d ? "" : "none";
-    if (d) this.#active.setAttribute("d", d);
+    this.#svg.setAttribute("height", String(g.height));
+    this.#track.style.display = this.#stop.style.display = g.track ? "" : "none";
+    if (g.track) {
+      for (const [k, v] of Object.entries({ x1: g.track.x1, x2: g.track.x2, y1: g.mid, y2: g.mid, stroke: trackColor, "stroke-width": thickness })) this.#track.setAttribute(k, String(v));
+      for (const [k, v] of Object.entries({ cx: g.track.x2, cy: g.mid, r: thickness / 2, fill: color })) this.#stop.setAttribute(k, String(v));
+    }
+    this.#active.style.display = g.active ? "" : "none";
+    if (g.active) this.#active.setAttribute("d", g.active);
     this.#active.setAttribute("stroke", color);
     this.#active.setAttribute("stroke-width", String(thickness));
   }

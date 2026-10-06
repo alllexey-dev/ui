@@ -51,6 +51,15 @@ entry so apps without charts do not need uPlot:
 import Chart from "@alllexey/ui/chart";
 ```
 
+Charts handle signed values (returns, balances): the y axis keeps zero in view and draws a zero line when the
+data crosses it; `min` and `max` pin either end.
+
+Mobile: put `viewport-fit=cover` into the viewport meta so the shell can respect notches and the home indicator:
+
+```html
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+```
+
 Helpers: `revalidate` (stale-while-revalidate cache), `clipPath` / `svgPath` for shapes, `applyTheme`,
 `schemeVariables`, `cssVar`.
 

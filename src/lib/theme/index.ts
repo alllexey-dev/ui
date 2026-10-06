@@ -15,11 +15,26 @@ export interface ThemeOptions {
   target?: HTMLElement;
 }
 
-/** Writes all colour roles as --md-* custom properties and marks the element with data-theme. */
+/** Writes all colour roles as --md-* custom properties, marks the element with data-theme and, for <html>, the theme-color meta. */
 export function applyTheme({ seed, variant = "tonal", mode, target = document.documentElement }: ThemeOptions): void {
+  const vars = schemeVariables(seed, mode === "dark", variant);
   target.dataset.theme = mode;
-  for (const [name, value] of Object.entries(schemeVariables(seed, mode === "dark", variant))) {
+  for (const [name, value] of Object.entries(vars)) {
     target.style.setProperty(name, value);
+  }
+  if (target === document.documentElement) paintBrowserChrome(vars["--md-surface"]);
+}
+
+/** Mobile browsers colour their address bar from <meta name="theme-color">: keep it on the surface colour. */
+function paintBrowserChrome(color: string): void {
+  const metas = document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]');
+  if (!metas.length) {
+    document.head.append(Object.assign(document.createElement("meta"), { name: "theme-color", content: color }));
+    return;
+  }
+  for (const meta of metas) {
+    meta.removeAttribute("media");
+    meta.content = color;
   }
 }
 
