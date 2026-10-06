@@ -1,0 +1,60 @@
+{
+  "name": "@alllexey-dev/ui",
+  "version": "0.1.0",
+  "description": "Material 3 Expressive design system for alllexey.dev projects: tokens, CSS components, web components and Svelte 5 components.",
+  "license": "MIT",
+  "type": "module",
+  "repository": { "type": "git", "url": "git+https://github.com/alllexey-dev/ui.git" },
+  "homepage": "https://github.com/alllexey-dev/ui#readme",
+  "keywords": ["material-3", "material-expressive", "svelte", "design-system", "web-components"],
+  "sideEffects": ["**/*.css", "./dist/elements/index.js"],
+  "svelte": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": { "types": "./dist/index.d.ts", "svelte": "./dist/index.js", "default": "./dist/index.js" },
+    "./chart": { "types": "./dist/components/Chart.svelte.d.ts", "svelte": "./dist/components/Chart.svelte", "default": "./dist/components/Chart.svelte" },
+    "./css": "./dist/styles/ui.css",
+    "./theme": { "types": "./dist/theme/index.d.ts", "default": "./dist/theme/index.js" },
+    "./shapes": { "types": "./dist/shapes.d.ts", "default": "./dist/shapes.js" },
+    "./elements": { "types": "./dist/elements/index.d.ts", "default": "./dist/elements/index.js" },
+    "./elements/svelte": { "types": "./dist/elements/svelte.d.ts" },
+    "./standalone/ui.js": "./dist/standalone/ui.js",
+    "./standalone/ui.css": "./dist/standalone/ui.css",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": { "access": "public" },
+  "bin": { "ui-theme": "./dist/bin/ui-theme.js" },
+  "files": ["dist", "README.md", "LICENSE", "UX.md"],
+  "scripts": {
+    "dev": "vite --config docs/vite.config.ts",
+    "build": "svelte-package -i src/lib -o dist && rm -rf dist/standalone && vite build --config vite.scheme.config.ts && vite build --config vite.standalone.config.ts && vite build --config vite.cli.config.ts",
+    "gen:theme": "vite build --config vite.cli.config.ts && node dist/bin/ui-theme.js --out src/lib/styles/theme-default.css",
+    "build:docs": "vite build --config docs/vite.config.ts",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "test": "vitest run",
+    "lint:package": "publint",
+    "prepack": "npm run build"
+  },
+  "peerDependencies": {
+    "svelte": "^5.40.0",
+    "uplot": "^1.6.30"
+  },
+  "peerDependenciesMeta": {
+    "uplot": { "optional": true },
+    "svelte": { "optional": true }
+  },
+  "devDependencies": {
+    "@material/material-color-utilities": "0.4.0",
+    "@material-symbols/svg-400": "0.47.6",
+    "@sveltejs/package": "3.0.0",
+    "@sveltejs/vite-plugin-svelte": "7.3.1",
+    "@types/node": "24.19.1",
+    "publint": "0.3.25",
+    "svelte": "5.57.2",
+    "svelte-check": "4.7.6",
+    "typescript": "6.0.3",
+    "uplot": "1.6.32",
+    "vite": "8.3.3",
+    "vitest": "5.0.3"
+  }
+}

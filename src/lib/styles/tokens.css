@@ -1,0 +1,50 @@
+/* Material 3 Expressive tokens for alllexey.dev projects. Colour roles (--md-<role>) are written to :root at
+   runtime by the theme (@alllexey-dev/ui/theme); until then theme-default.css (the shared default, generated
+   by `npm run gen:theme`) keeps the first paint right, including system dark mode. */
+:root {
+  --md-font: "Roboto Flex", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --md-mono: "Roboto Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* type scale: size/line-height, weight; "emphasized" styles are wider and heavier */
+  --md-display-large: 400 57px/64px var(--md-font);
+  --md-display-medium: 400 45px/52px var(--md-font);
+  --md-display-small: 400 36px/44px var(--md-font);
+  --md-headline-large: 400 32px/40px var(--md-font);
+  --md-headline-medium: 400 28px/36px var(--md-font);
+  --md-headline-small: 400 24px/32px var(--md-font);
+  --md-title-large: 400 22px/28px var(--md-font);
+  --md-title-medium: 500 16px/24px var(--md-font);
+  --md-title-small: 500 14px/20px var(--md-font);
+  --md-body-large: 400 16px/24px var(--md-font);
+  --md-body-medium: 400 14px/20px var(--md-font);
+  --md-body-small: 400 12px/16px var(--md-font);
+  --md-label-large: 500 14px/20px var(--md-font);
+  --md-label-medium: 500 12px/16px var(--md-font);
+  --md-label-small: 500 11px/16px var(--md-font);
+
+  /* shape scale */
+  --md-shape-xs: 4px;
+  --md-shape-sm: 8px;
+  --md-shape-md: 12px;
+  --md-shape-lg: 16px;
+  --md-shape-lg-inc: 20px;
+  --md-shape-xl: 28px;
+  --md-shape-xl-inc: 32px;
+  --md-shape-xxl: 48px;
+  --md-shape-full: 999px;
+
+  /* expressive motion: spatial springs overshoot, effect springs do not */
+  --md-spring-fast: cubic-bezier(0.42, 1.67, 0.21, 0.9);
+  --md-spring-default: cubic-bezier(0.38, 1.21, 0.22, 1);
+  --md-spring-slow: cubic-bezier(0.39, 1.29, 0.35, 0.98);
+  --md-effects-fast: cubic-bezier(0.31, 0.94, 0.34, 1);
+  --md-effects-default: cubic-bezier(0.34, 0.8, 0.34, 1);
+
+  --md-elevation-1: 0 1px 2px rgb(0 0 0 / 0.3), 0 1px 3px 1px rgb(0 0 0 / 0.15);
+  --md-elevation-2: 0 1px 2px rgb(0 0 0 / 0.3), 0 2px 6px 2px rgb(0 0 0 / 0.15);
+  --md-elevation-3: 0 4px 8px 3px rgb(0 0 0 / 0.15), 0 1px 3px rgb(0 0 0 / 0.3);
+
+  --md-chart-grid: color-mix(in srgb, var(--md-outline-variant) 70%, transparent);
+}
+:root[data-theme="dark"] { color-scheme: dark; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme]) { --md-surface: #141218; --md-on-surface: #e6e0e9; color-scheme: dark; } }
