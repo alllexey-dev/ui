@@ -1,4 +1,4 @@
-# @alllexey-dev/ui
+# @alllexey/ui
 
 Material 3 Expressive design system for alllexey.dev projects: colour scheme from one seed, tokens, CSS components,
 framework-free custom elements and Svelte 5 components. One look and one set of UX rules ([UX.md](UX.md)) for
@@ -14,15 +14,15 @@ every site and app.
 ## Install
 
 ```bash
-npm install @alllexey-dev/ui
+npm install @alllexey/ui
 ```
 
 ## Svelte 5
 
 ```svelte
 <script lang="ts" module>
-  import "@alllexey-dev/ui/css";
-  import { createTheme, defineIcons } from "@alllexey-dev/ui";
+  import "@alllexey/ui/css";
+  import { createTheme, defineIcons } from "@alllexey/ui";
   import dashboard from "@material-symbols/svg-400/rounded/dashboard.svg?raw";
 
   defineIcons({ dashboard });
@@ -30,7 +30,7 @@ npm install @alllexey-dev/ui
 </script>
 
 <script lang="ts">
-  import { AppShell, Page, PageHeader, Snackbars, snackbars } from "@alllexey-dev/ui";
+  import { AppShell, Page, PageHeader, Snackbars, snackbars } from "@alllexey/ui";
 </script>
 
 <AppShell brand="cringetrader" {theme} items={[{ href: "#/", label: "Обзор", icon: "dashboard", active: true }]}>
@@ -48,7 +48,7 @@ Components: `AppShell`, `Page`, `PageHeader`, `Account`, `Dialog`, `ConfirmDialo
 entry so apps without charts do not need uPlot:
 
 ```ts
-import Chart from "@alllexey-dev/ui/chart";
+import Chart from "@alllexey/ui/chart";
 ```
 
 Helpers: `revalidate` (stale-while-revalidate cache), `clipPath` / `svgPath` for shapes, `applyTheme`,
@@ -66,8 +66,8 @@ Every class is prefixed with `m3-`; modifiers only apply together with one:
 ## Without a build step
 
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@alllexey-dev/ui@0/dist/standalone/ui.css" />
-<script type="module" src="https://cdn.jsdelivr.net/npm/@alllexey-dev/ui@0/dist/standalone/ui.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@alllexey/ui@0/dist/standalone/ui.css" />
+<script type="module" src="https://cdn.jsdelivr.net/npm/@alllexey/ui@0/dist/standalone/ui.js"></script>
 
 <button class="m3-btn tonal">Кнопка</button>
 <m3-shape shape="cookie9" size="48">A</m3-shape>

@@ -1,4 +1,4 @@
-// Types for <m3-*> custom elements in Svelte markup: add `import "@alllexey-dev/ui/elements/svelte";` to a .d.ts file.
+// Types for <m3-*> custom elements in Svelte markup: add `import "@alllexey/ui/elements/svelte";` to a .d.ts file.
 import "svelte/elements";
 
 declare module "svelte/elements" {

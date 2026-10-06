@@ -2,8 +2,8 @@
   import { PageHeader } from "../../src/lib/index.js";
 
   let value = $state(40);
-  const html = `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@alllexey-dev/ui/dist/standalone/ui.css">
-<script type="module" src="https://cdn.jsdelivr.net/npm/@alllexey-dev/ui/dist/standalone/ui.js"><\/script>
+  const html = `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@alllexey/ui/dist/standalone/ui.css">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@alllexey/ui/dist/standalone/ui.js"><\/script>
 
 <button class="m3-btn tonal">Кнопка</button>
 <m3-shape shape="cookie9" size="48">A</m3-shape>

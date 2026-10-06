@@ -1,5 +1,5 @@
 /* Material 3 Expressive tokens for alllexey.dev projects. Colour roles (--md-<role>) are written to :root at
-   runtime by the theme (@alllexey-dev/ui/theme); until then theme-default.css (the shared default, generated
+   runtime by the theme (@alllexey/ui/theme); until then theme-default.css (the shared default, generated
    by `npm run gen:theme`) keeps the first paint right, including system dark mode. */
 :root {
   --md-font: "Roboto Flex", system-ui, -apple-system, "Segoe UI", sans-serif;

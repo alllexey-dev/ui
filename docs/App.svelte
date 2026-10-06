@@ -24,7 +24,7 @@
 
 <svelte:window onhashchange={() => (hash = location.hash.slice(2))} />
 
-<AppShell brand="@alllexey-dev/ui" brandHref="#/" {items} {theme} fab={{ label: "Главное действие", icon: "add", onclick: () => snackbars.show("FAB - для главного действия приложения") }}>
+<AppShell brand="@alllexey/ui" brandHref="#/" {items} {theme} fab={{ label: "Главное действие", icon: "add", onclick: () => snackbars.show("FAB - для главного действия приложения") }}>
   {#snippet account()}<Account name="alllexey" status="на связи" tone="ok" />{/snippet}
   {#key current.key}
     <Page><current.page /></Page>
