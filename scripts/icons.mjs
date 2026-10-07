@@ -6,8 +6,9 @@ const builtin = [
   "menu", "close", "check", "arrow_back", "chevron_right", "keyboard_arrow_down", "palette", "format_paint",
   "light_mode", "dark_mode", "brightness_auto", "warning", "error", "info", "help", "check_circle", "lock",
   "refresh", "search", "more_vert", "open_in_new", "content_copy", "wifi_off", "inbox", "logout", "settings",
+  "thumb_up", "thumb_down", "attach_file", "videocam", "description",
 ];
-const filled = ["warning", "error", "check_circle", "info"];
+const filled = ["warning", "error", "check_circle", "info", "thumb_up", "thumb_down"];
 
 const pathOf = (name) => {
   const svg = readFileSync(new URL(`../node_modules/@material-symbols/svg-400/rounded/${name}.svg`, import.meta.url), "utf8");

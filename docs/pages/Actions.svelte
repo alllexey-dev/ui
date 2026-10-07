@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { ButtonGroup, Icon, PageHeader, Search, Switch } from "../../src/lib/index.js";
+  import { ButtonGroup, FileDrop, Icon, PageHeader, Search, Switch, TextField, VoteButtons, type VoteValue } from "../../src/lib/index.js";
 
   let period = $state("24h");
   let view = $state("list");
@@ -8,6 +8,11 @@
   let query = $state("");
   let tab = $state("all");
   let chips = $state(new Set(["running"]));
+  let name = $state("");
+  let nameTouched = $state(false);
+  let about = $state("");
+  let files = $state<File[]>([]);
+  let vote = $state<VoteValue>(0);
   const toggle = (c: string) => (chips = new Set(chips.has(c) ? [...chips].filter((x) => x !== c) : [...chips, c]));
 </script>
 
@@ -69,9 +74,23 @@
   </div>
 </section>
 
+<section class="m3-card">
+  <h2 class="m3-section-title">Формы</h2>
+  <div class="form">
+    <TextField label="Название" bind:value={name} placeholder="Например: backend" error={nameTouched && name.trim().length < 3 ? "Не короче 3 символов" : ""} onblur={() => (nameTouched = true)} />
+    <TextField label="Описание" bind:value={about} multiline optional placeholder="Что делает сервис" hint="Покажется в списке стеков" />
+    <FileDrop bind:files accept="image/*,video/*" maxFiles={3} maxSize={(f) => (f.type.startsWith("video/") ? 50 * 1024 * 1024 : 10 * 1024 * 1024)} title="Добавить скриншоты" hint="До 3 файлов: картинки до 10 МБ, видео до 50 МБ" icon="image" />
+  </div>
+  <div class="row">
+    <VoteButtons up={12 + (vote === 1 ? 1 : 0)} down={3 + (vote === -1 ? 1 : 0)} bind:value={vote} />
+    <VoteButtons up={12} down={3} value={1} large />
+  </div>
+</section>
+
 <style>
   section { margin-bottom: 16px; display: flex; flex-direction: column; gap: 16px; }
   .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
   .grow { flex: 1; min-width: 240px; }
+  .form { display: flex; flex-direction: column; gap: 16px; max-width: 560px; }
   .switch { display: inline-flex; align-items: center; gap: 12px; font: var(--md-body-large); }
 </style>

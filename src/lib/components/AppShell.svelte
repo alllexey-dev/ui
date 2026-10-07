@@ -174,8 +174,11 @@
   .expanded .badge { left: auto; right: 16px; top: 16px; }
 
   .rail-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding-top: 12px; }
-  .rail :global(.rail-text) { opacity: 0; transition: opacity 0.2s; }
-  .expanded .rail :global(.rail-text) { opacity: 1; }
+  /* Collapsed rail: text next to the avatar leaves the layout, so the avatar sits on the rail's axis. */
+  .rail :global(.rail-text) { display: none; }
+  .rail :global(.m3-account) { justify-content: center; padding-inline: 0; }
+  .expanded .rail :global(.rail-text) { display: block; animation: m3-fade 0.3s; }
+  .expanded .rail :global(.m3-account) { justify-content: flex-start; padding-inline: 10px; }
 
   .body { min-width: 0; display: flex; flex-direction: column; }
   .topbar { display: none; align-items: center; gap: 8px; height: calc(64px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) max(8px, env(safe-area-inset-right)) 0 max(8px, env(safe-area-inset-left)); position: sticky; top: 0; z-index: 10; background: var(--md-surface); }
@@ -190,7 +193,9 @@
     .expanded .indicator { width: 56px; height: 32px; justify-content: center; padding: 0; }
     .expanded .item .label { position: static; font: var(--md-label-medium); }
     .expanded .rail-fab { width: 56px; }
-    .expanded .fab-label, .expanded .brand, .expanded .rail :global(.rail-text) { opacity: 0; }
+    .expanded .fab-label, .expanded .brand { opacity: 0; }
+    .expanded .rail :global(.rail-text) { display: none; }
+    .expanded .rail :global(.m3-account) { justify-content: center; padding-inline: 0; }
     .menu-btn { display: none; }
     .rail-top { padding-left: 4px; }
     .expanded .badge { left: calc(50% + 8px); right: auto; top: 2px; }
@@ -206,7 +211,9 @@
     .rail .indicator { width: 100%; height: 56px; justify-content: flex-start; padding-left: 16px; display: flex; align-items: center; }
     .rail .item .label { position: absolute; left: 56px; font: var(--md-label-large); }
     .rail .badge { left: auto; right: 16px; top: 20px; }
-    .rail .brand, .rail .fab-label, .shell .rail :global(.rail-text) { opacity: 1; }
+    .rail .brand, .rail .fab-label { opacity: 1; }
+    .shell .rail :global(.rail-text) { display: block; }
+    .shell .rail :global(.m3-account) { justify-content: flex-start; padding-inline: 10px; }
     .rail .rail-fab { width: calc(100% - 16px); }
     .menu-btn { display: none; }
     .close-btn { display: inline-grid; }

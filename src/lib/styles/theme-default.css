@@ -58,8 +58,8 @@
   --md-on-secondary-container: #b3c0d4;
   --md-tertiary: #e3dbff;
   --md-on-tertiary: #524b74;
-  --md-tertiary-container: #d5cbfc;
-  --md-on-tertiary-container: #49426a;
+  --md-tertiary-container: #48416a;
+  --md-on-tertiary-container: #e6deff;
   --md-error: #fa746f;
   --md-on-error: #490006;
   --md-error-container: #871f21;
@@ -105,8 +105,8 @@
     --md-on-secondary-container: #b3c0d4;
     --md-tertiary: #e3dbff;
     --md-on-tertiary: #524b74;
-    --md-tertiary-container: #d5cbfc;
-    --md-on-tertiary-container: #49426a;
+    --md-tertiary-container: #48416a;
+    --md-on-tertiary-container: #e6deff;
     --md-error: #fa746f;
     --md-on-error: #490006;
     --md-error-container: #871f21;

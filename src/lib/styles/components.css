@@ -201,6 +201,15 @@ a.m3-list-item:active::before, button.m3-list-item:active::before { opacity: 0.1
 }
 .m3-field:focus { border-bottom: 2px solid var(--md-primary); }
 .m3-field.compact { height: 40px; font: var(--md-body-medium); }
+textarea.m3-field { height: auto; min-height: 112px; padding: 14px 16px; resize: vertical; line-height: 1.45; font: var(--md-body-large); }
+.m3-field[aria-invalid="true"] { border-bottom: 2px solid var(--md-error); }
+.m3-field:disabled { opacity: 0.38; }
+
+/* labelled field (TextField): label above, error or hint below */
+.m3-text-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.m3-text-field > .m3-field { width: 100%; box-sizing: border-box; }
+.m3-text-field > .note { padding: 0 16px; }
+.m3-text-field.invalid > label, .m3-text-field.invalid > .note { color: var(--md-error); }
 
 /* tabs */
 .m3-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--md-surface-container-highest); }

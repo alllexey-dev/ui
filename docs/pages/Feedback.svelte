@@ -3,6 +3,8 @@
 
   let confirm = $state<"" | "plain" | "danger">("");
   let info = $state(false);
+  let details = $state(false);
+  let nested = $state(false);
   let loading = $state(false);
 
   function reload() {
@@ -17,6 +19,7 @@
   <h2 class="m3-section-title">Диалоги</h2>
   <div class="row">
     <button class="m3-btn tonal" onclick={() => (info = true)}>Обычный диалог</button>
+    <button class="m3-btn tonal" onclick={() => (details = true)}>Диалог с подтверждением внутри</button>
     <button class="m3-btn" onclick={() => (confirm = "plain")}>Подтверждение</button>
     <button class="m3-btn danger" onclick={() => (confirm = "danger")}>Удаление с вводом имени</button>
   </div>
@@ -53,6 +56,17 @@
   <Dialog title="Сессия истекла" text="Войдите заново, чтобы продолжить." icon="lock" shape="sunny" tone="error" modal>
     {#snippet actions()}<button class="m3-btn" onclick={() => (info = false)}>Войти</button>{/snippet}
   </Dialog>
+{/if}
+{#if details}
+  <Dialog title="Заявка #42" text="Escape закрывает только верхний диалог: подтверждение, а не эту карточку." icon="inbox" onclose={() => (details = false)}>
+    {#snippet actions()}
+      <button class="m3-btn text" onclick={() => (details = false)}>Закрыть</button>
+      <button class="m3-btn danger-tonal" onclick={() => (nested = true)}>Удалить</button>
+    {/snippet}
+  </Dialog>
+{/if}
+{#if nested}
+  <ConfirmDialog title="Удалить заявку?" text="Её нельзя будет восстановить." confirmLabel="Удалить" danger onconfirm={() => ((nested = false), (details = false), snackbars.show("Заявка удалена"))} oncancel={() => (nested = false)} />
 {/if}
 {#if confirm}
   <ConfirmDialog

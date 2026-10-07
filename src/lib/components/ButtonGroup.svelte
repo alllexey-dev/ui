@@ -23,7 +23,7 @@
 
 <div class="m3-group" class:small role="radiogroup" aria-label={label || undefined}>
   {#each options as option}
-    <button role="radio" aria-checked={value === option.value} class:active={value === option.value} onclick={() => pick(option.value)}>
+    <button type="button" role="radio" aria-checked={value === option.value} class:active={value === option.value} onclick={() => pick(option.value)}>
       {#if option.icon}<Icon name={option.icon} size={18} />{/if}{option.label}
     </button>
   {/each}

@@ -5,7 +5,7 @@
   let { name, status = "", tone = "" }: { name: string; status?: string; tone?: "" | "ok" | "bad" } = $props();
 </script>
 
-<div class="account">
+<div class="m3-account">
   <Shape shape="cookie9" size={36} color="var(--md-tertiary-container)" fg="var(--md-on-tertiary-container)">
     <span class="m3-label-large">{(name || "?").slice(0, 1).toUpperCase()}</span>
   </Shape>
@@ -16,6 +16,6 @@
 </div>
 
 <style>
-  .account { display: flex; align-items: center; gap: 12px; padding: 8px 10px; }
+  .m3-account { display: flex; align-items: center; gap: 12px; padding: 8px 10px; }
   .rail-text { min-width: 0; }
 </style>

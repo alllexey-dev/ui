@@ -78,6 +78,20 @@ function customColor(name: string, hex: string, seed: number, dark: boolean): Re
   };
 }
 
+/**
+ * The 2025 spec keeps some container roles (tertiary in every variant, primary in vibrant, expressive and
+ * fidelity) as the same light accent in dark mode. Cards, pills and buttons use containers as surfaces, so in a
+ * dark scheme a light container becomes the classic dark one: tone 30 with a tone 90 on-colour.
+ */
+function darkenContainers(scheme: DynamicScheme, vars: Record<string, string>): void {
+  const palettes = { primary: scheme.primaryPalette, secondary: scheme.secondaryPalette, tertiary: scheme.tertiaryPalette, error: scheme.errorPalette };
+  for (const [name, palette] of Object.entries(palettes)) {
+    if (Hct.fromInt(argbFromHex(vars[`--md-${name}-container`])).tone <= 50) continue;
+    vars[`--md-${name}-container`] = hexFromArgb(palette.tone(30));
+    vars[`--md-on-${name}-container`] = hexFromArgb(palette.tone(90));
+  }
+}
+
 /** All colour roles as CSS custom properties (--md-<role>). */
 export function schemeVariables(seedHex: string, dark: boolean, variant: Variant): Record<string, string> {
   const seed = argbFromHex(seedHex);
@@ -86,6 +100,7 @@ export function schemeVariables(seedHex: string, dark: boolean, variant: Variant
   for (const [name, role] of Object.entries(roles)) {
     vars[`--md-${name}`] = hexFromArgb(role.getArgb(scheme));
   }
+  if (dark) darkenContainers(scheme, vars);
   for (const [name, value] of Object.entries({ ...customColor("success", "#2e7d32", seed, dark), ...customColor("warning", "#c77700", seed, dark) })) {
     vars[`--md-${name}`] = value;
   }

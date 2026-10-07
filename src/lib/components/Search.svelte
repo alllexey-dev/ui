@@ -7,7 +7,7 @@
 <label class="m3-search">
   <Icon name="search" />
   <input type="search" bind:value {placeholder} oninput={() => oninput?.(value)} />
-  {#if value}<button class="m3-icon-btn small" aria-label="Очистить" onclick={() => ((value = ""), oninput?.(""))}><Icon name="close" size={20} /></button>{/if}
+  {#if value}<button type="button" class="m3-icon-btn small" aria-label="Очистить" onclick={() => ((value = ""), oninput?.(""))}><Icon name="close" size={20} /></button>{/if}
 </label>
 
 <style>

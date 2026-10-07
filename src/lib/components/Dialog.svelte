@@ -1,3 +1,9 @@
+<script lang="ts" module>
+  // Open dialogs, innermost last: Escape closes only the topmost one (a confirmation over a dialog
+  // must not take its parent down with it).
+  const open: object[] = [];
+</script>
+
 <script lang="ts">
   import type { Snippet } from "svelte";
   import { lockScroll } from "../scroll-lock.js";
@@ -6,7 +12,8 @@
   import Shape from "./Shape.svelte";
 
   // Basic M3 dialog: optional shaped icon, headline, supporting text, content and actions.
-  // Escape and a click on the scrim call onclose unless `modal` is set (then only actions close it).
+  // Escape (topmost dialog only) and a click on the scrim call onclose unless `modal` is set
+  // (then only actions close it).
   let {
     title,
     text = "",
@@ -32,21 +39,28 @@
   } = $props();
 
   const close = () => !modal && onclose?.();
+  const self = {};
   let box: HTMLDivElement;
 
+  function onkeydown(e: KeyboardEvent) {
+    if (e.key === "Escape" && open.at(-1) === self) close();
+  }
+
   $effect(() => {
+    open.push(self);
     const previous = document.activeElement as HTMLElement | null;
     // Let an autofocus field inside take focus first; otherwise focus the dialog itself.
     queueMicrotask(() => box.contains(document.activeElement) || box.focus());
     const unlock = lockScroll();
     return () => {
+      open.splice(open.indexOf(self), 1);
       unlock();
       previous?.focus?.();
     };
   });
 </script>
 
-<svelte:window onkeydown={(e) => e.key === "Escape" && close()} />
+<svelte:window {onkeydown} />
 
 <div class="m3-scrim" role="presentation" onclick={close}>
   <div bind:this={box} class="m3-dialog" class:wide role={modal ? "alertdialog" : "dialog"} aria-modal="true" aria-label={title} tabindex="-1" onclick={(e) => e.stopPropagation()} onkeydown={() => {}}>

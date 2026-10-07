@@ -33,7 +33,7 @@
         {#each columns as col}
           <th aria-sort={sort?.column === col.name ? (sort.desc ? "descending" : "ascending") : undefined}>
             {#if onsort}
-              <button onclick={() => onsort(col.name)} title={col.type} class:sorted={sort?.column === col.name}>
+              <button type="button" onclick={() => onsort(col.name)} title={col.type} class:sorted={sort?.column === col.name}>
                 {col.name}{#if col.type}<span class="type">{col.type}</span>{/if}{#if sort?.column === col.name}<span class="dir">{sort.desc ? "↓" : "↑"}</span>{/if}
               </button>
             {:else}

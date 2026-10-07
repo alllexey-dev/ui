@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { argbFromHex, Hct } from "@material/material-color-utilities";
 import { schemeVariables, variants } from "../src/lib/theme/scheme.js";
 import { staticThemeCss } from "../src/lib/theme/static.js";
 
@@ -56,5 +57,25 @@ describe("theme-default.css", () => {
     const { defaultChoice } = await import("../src/lib/theme/shared.js");
     const file = readFileSync(new URL("../src/lib/styles/theme-default.css", import.meta.url), "utf8");
     expect(file).toBe(staticThemeCss(defaultChoice.seed, defaultChoice.variant));
+  });
+});
+
+describe("containers in dark schemes", () => {
+  const seeds = ["#0061a4", "#6750a4", "#006a6a", "#386a20", "#b4532a", "#9c4166"];
+  const tone = (hex: string) => Hct.fromInt(argbFromHex(hex)).tone;
+
+  it.each(variants.flatMap((v) => seeds.map((s) => [v, s] as const)))("%s %s: containers are dark surfaces with readable text", (variant, seed) => {
+    const vars = schemeVariables(seed, true, variant);
+    for (const role of ["primary", "secondary", "tertiary", "error"]) {
+      const container = vars[`--md-${role}-container`];
+      expect(tone(container), `${role}-container ${container}`).toBeLessThanOrEqual(50);
+      expect(contrast(vars[`--md-on-${role}-container`], container), `on-${role}-container`).toBeGreaterThan(4.5);
+    }
+  });
+
+  it("leaves containers that are already dark as the 2025 spec made them", () => {
+    const vars = schemeVariables("#0061a4", true, "tonal");
+    expect(vars["--md-primary-container"]).toBe("#3b5472");
+    expect(vars["--md-secondary-container"]).toBe("#303c4c");
   });
 });

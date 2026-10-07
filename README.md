@@ -42,9 +42,10 @@ npm install @alllexey/ui
 <Snackbars />
 ```
 
-Components: `AppShell`, `Page`, `PageHeader`, `Account`, `Dialog`, `ConfirmDialog`, `ThemeSettings`, `Snackbars`
-(with the `snackbars` store), `ButtonGroup`, `Switch`, `Search`, `EmptyState`, `LoadingIndicator`, `LoadingOverlay`,
-`WavyProgress`, `Meter`, `Shape`, `StatusShape`, `Sparkline`, `DataGrid`, `Icon`. The uPlot chart is a separate
+Components: `AppShell`, `TopBar` (single-page sites), `Page`, `PageHeader`, `Account`, `Dialog`, `ConfirmDialog`,
+`ThemeSettings`, `Snackbars` (with the `snackbars` store), `ButtonGroup`, `Switch`, `Search`, `TextField`, `FileDrop`,
+`VoteButtons`, `EmptyState`, `LoadingIndicator`, `LoadingOverlay`, `WavyProgress`, `Meter`, `Shape`, `StatusShape`,
+`Sparkline`, `DataGrid`, `Icon`. The uPlot chart is a separate
 entry so apps without charts do not need uPlot:
 
 ```ts
@@ -60,7 +61,7 @@ Mobile: put `viewport-fit=cover` into the viewport meta so the shell can respect
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 ```
 
-Helpers: `revalidate` (stale-while-revalidate cache), `clipPath` / `svgPath` for shapes, `applyTheme`,
+Helpers: `accepts`, `fileSize`, `isImage`, `isVideo` for files, `revalidate` (stale-while-revalidate cache), `clipPath` / `svgPath` for shapes, `applyTheme`,
 `schemeVariables`, `cssVar`.
 
 ## CSS classes
@@ -69,7 +70,7 @@ Every class is prefixed with `m3-`; modifiers only apply together with one:
 `m3-btn tonal|tertiary|outlined|text|elevated|danger|danger-tonal|small|large`, `m3-icon-btn`, `m3-fab`,
 `m3-group`, `m3-chip selected`, `m3-pill ok|warn|bad|neutral`, `m3-card low|high|outlined|primary|...`,
 `m3-list`, `m3-list-item`, `m3-segmented`, `m3-table`, `m3-tabs`, `m3-search`, `m3-field`, `m3-switch`,
-`m3-dialog`, `m3-snackbar`, typography (`m3-title-large`, `m3-body-medium`, ...) and text helpers
+`m3-text-field`, `m3-dialog`, `m3-snackbar`, typography (`m3-title-large`, `m3-body-medium`, ...) and text helpers
 (`m3-muted`, `m3-num`, `m3-mono`, `m3-clip`).
 
 ## Without a build step
