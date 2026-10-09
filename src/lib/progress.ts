@@ -25,6 +25,11 @@ export function progressGeometry(fraction: number, width: number, thickness: num
   return { height, mid, active, track: trackStart < trackEnd ? { x1: trackStart, x2: trackEnd } : null };
 }
 
+/** Indicator and track colours of a tone: primary sits on the secondary container, the others on their own. */
+export function progressColors(tone: string): { indicator: string; track: string } {
+  return { indicator: `var(--md-${tone})`, track: tone === "primary" ? "var(--md-secondary-container)" : `var(--md-${tone}-container)` };
+}
+
 /**
  * Eases a displayed value towards its target on animation frames, so everything drawn from it moves together.
  * The first value and every value under prefers-reduced-motion are applied at once.

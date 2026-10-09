@@ -65,7 +65,7 @@
 <div class="m3-scrim" role="presentation" onclick={close}>
   <div bind:this={box} class="m3-dialog" class:wide role={modal ? "alertdialog" : "dialog"} aria-modal="true" aria-label={title} tabindex="-1" onclick={(e) => e.stopPropagation()} onkeydown={() => {}}>
     {#if icon}
-      <Shape {shape} size={48} color="var(--md-{tone}-container)" fg="var(--md-on-{tone}-container)"><Icon name={icon} /></Shape>
+      <Shape {shape} size={48} {tone}><Icon name={icon} /></Shape>
     {/if}
     <h2>{title}</h2>
     {#if text}<p>{text}</p>{/if}

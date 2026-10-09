@@ -2,11 +2,24 @@
   import uPlot from "uplot";
   import "uplot/dist/uPlot.min.css";
   import { onMount, untrack } from "svelte";
-  import { chartRange } from "../chart-range.js";
-  import { cssVar } from "../theme/index.js";
+  import { chartRange, valueAt } from "../chart-data.js";
+  import { cssVar, onThemeChange } from "../theme/apply.js";
 
-  /** color is a CSS custom property, e.g. "--md-primary". */
-  export type Series = { label: string; color: string };
+  export type Series = {
+    label: string;
+    /** A theme custom property, e.g. "--md-primary". */
+    color: string;
+    /** Line width in pixels; the first series is 2.5, the others 2. */
+    width?: number;
+    /** Canvas dash pattern, e.g. [6, 4] for a benchmark or reference line. */
+    dash?: number[];
+    /** Tint under the line; by default only the first series has it. */
+    fill?: boolean;
+  };
+  export type Marker = { time: number; label: string };
+
+  // Time series line chart. `times` are unix seconds; `values` has one array per series, aligned with `times`,
+  // with null where a series has no point (alignSeries builds that from separate point lists).
   let {
     times,
     series,
@@ -15,24 +28,61 @@
     format = (v: number) => v.toFixed(0),
     min,
     max,
+    zero = true,
+    markers = [],
     withDate = false,
   }: {
     times: number[];
     series: Series[];
-    values: number[][];
+    values: (number | null)[][];
     height?: number;
     format?: (v: number) => string;
     /** Pins the bottom of the y axis; by default it is 0, or below the lowest value when there are negatives. */
     min?: number;
     max?: number;
+    /** Keep zero in view (amounts, returns); turn off for prices and other values far from zero. */
+    zero?: boolean;
+    /** Dashed vertical lines with a caption, e.g. a deploy or the start of a period. */
+    markers?: Marker[];
     withDate?: boolean;
   } = $props();
 
   let host: HTMLDivElement;
   let plot: uPlot | null = null;
-  let hover = $state<{ time: string; items: { label: string; color: string; value: string }[] } | null>(null);
+  let hover = $state<{ time: string; at: number } | null>(null);
   const clock = (t: number) =>
     new Date(t * 1000).toLocaleString("ru-RU", withDate ? { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" } : { hour: "2-digit", minute: "2-digit" });
+  const shown = (v: number | null) => (v === null ? "-" : format(v));
+
+  // Lines across the plot area: the zero line when the data crosses it and the markers.
+  function drawGuides(u: uPlot) {
+    const ctx = u.ctx;
+    const { left, top, width, height } = u.bbox;
+    ctx.save();
+    ctx.strokeStyle = cssVar("--md-outline");
+    ctx.lineWidth = devicePixelRatio;
+    const [bottom, ceiling] = [u.scales.y.min ?? 0, u.scales.y.max ?? 0];
+    if (bottom < 0 && ceiling > 0) {
+      const y = Math.round(u.valToPos(0, "y", true)) + 0.5;
+      ctx.beginPath();
+      ctx.moveTo(left, y);
+      ctx.lineTo(left + width, y);
+      ctx.stroke();
+    }
+    ctx.setLineDash([4 * devicePixelRatio, 4 * devicePixelRatio]);
+    ctx.fillStyle = cssVar("--md-on-surface-variant");
+    ctx.font = `500 ${11 * devicePixelRatio}px ${cssVar("--md-font")}`;
+    for (const marker of markers) {
+      const x = Math.round(u.valToPos(marker.time, "x", true)) + 0.5;
+      if (x < left || x > left + width) continue;
+      ctx.beginPath();
+      ctx.moveTo(x, top);
+      ctx.lineTo(x, top + height);
+      ctx.stroke();
+      ctx.fillText(marker.label, x + 6 * devicePixelRatio, top + 14 * devicePixelRatio);
+    }
+    ctx.restore();
+  }
 
   function options(width: number): uPlot.Options {
     const axis = { stroke: cssVar("--md-on-surface-variant"), grid: { stroke: cssVar("--md-chart-grid"), width: 1 }, ticks: { show: false }, font: `500 11px ${cssVar("--md-font")}` };
@@ -42,7 +92,7 @@
       padding: [8, 4, 0, 0],
       cursor: { points: { size: 9, width: 3 }, y: false, drag: { x: false, y: false } },
       legend: { show: false },
-      scales: { x: { time: true }, y: { range: (_u, dataMin, dataMax) => chartRange(dataMin, dataMax, { min, max }) } },
+      scales: { x: { time: true }, y: { range: (_u, dataMin, dataMax) => chartRange(dataMin, dataMax, { min, max, zero }) } },
       axes: [
         { ...axis, space: withDate ? 110 : 80, values: (_u, ticks) => ticks.map(clock) },
         { ...axis, size: 60, values: (_u, ticks) => ticks.map((v) => format(v)) },
@@ -52,41 +102,26 @@
         ...series.map((s, i) => ({
           label: s.label,
           stroke: cssVar(s.color),
-          width: i === 0 ? 2.5 : 2,
-          fill: i === 0 ? cssVar(s.color) + "22" : undefined,
+          width: s.width ?? (i === 0 ? 2.5 : 2),
+          dash: s.dash,
+          fill: (s.fill ?? i === 0) ? cssVar(s.color) + "22" : undefined,
           fillTo: 0,
+          spanGaps: true,
           points: { show: false },
         })),
       ],
       hooks: {
-        // Zero line when the data crosses it (returns, balances and other signed values).
-        draw: [
-          (u) => {
-            const [bottom, top] = [u.scales.y.min ?? 0, u.scales.y.max ?? 0];
-            if (!(bottom < 0 && top > 0)) return;
-            const y = Math.round(u.valToPos(0, "y", true)) + 0.5;
-            const ctx = u.ctx;
-            ctx.save();
-            ctx.strokeStyle = cssVar("--md-outline");
-            ctx.lineWidth = devicePixelRatio;
-            ctx.beginPath();
-            ctx.moveTo(u.bbox.left, y);
-            ctx.lineTo(u.bbox.left + u.bbox.width, y);
-            ctx.stroke();
-            ctx.restore();
-          },
-        ],
+        draw: [drawGuides],
         setCursor: [
           (u) => {
             const idx = u.cursor.idx;
-            if (idx == null) {
-              hover = null;
-              return;
-            }
-            hover = {
-              time: new Date((u.data[0][idx] as number) * 1000).toLocaleString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", second: withDate ? undefined : "2-digit" }),
-              items: series.map((s, i) => ({ label: s.label, color: s.color, value: format((u.data[i + 1][idx] as number) ?? 0) })),
-            };
+            hover =
+              idx == null
+                ? null
+                : {
+                    time: new Date((u.data[0][idx] as number) * 1000).toLocaleString("ru-RU", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", second: withDate ? undefined : "2-digit" }),
+                    at: idx,
+                  };
           },
         ],
       },
@@ -101,20 +136,18 @@
   onMount(() => {
     const resize = new ResizeObserver(() => plot?.setSize({ width: host.clientWidth, height }));
     resize.observe(host);
-    // Colours are baked into the canvas: rebuild when the theme rewrites the variables on <html>.
-    const theme = new MutationObserver(() => queueMicrotask(build));
-    theme.observe(document.documentElement, { attributes: true, attributeFilter: ["style", "data-theme"] });
+    // Colours are baked into the canvas: rebuild with the new ones when the theme changes.
+    const stopWatchingTheme = onThemeChange(build);
     return () => {
       resize.disconnect();
-      theme.disconnect();
+      stopWatchingTheme();
       plot?.destroy();
     };
   });
 
-  // First build and rebuilds when the axes change; plain data updates go through setData below.
+  // First build and rebuilds when the look changes; plain data updates go through setData below.
   $effect(() => {
-    void withDate;
-    void series;
+    void [withDate, series, zero, min, max, markers, height];
     untrack(build);
   });
 
@@ -125,12 +158,10 @@
 
 <div bind:this={host}></div>
 <div class="legend">
-  {#if hover}
-    <span class="time">{hover.time}</span>
-    {#each hover.items as item}<span class="key"><i style:background="var({item.color})"></i>{item.label} <b>{item.value}</b></span>{/each}
-  {:else}
-    {#each series as s, i}<span class="key"><i style:background="var({s.color})"></i>{s.label} <b>{values[i]?.length ? format(values[i][values[i].length - 1]) : "-"}</b></span>{/each}
-  {/if}
+  {#if hover}<span class="time">{hover.time}</span>{/if}
+  {#each series as s, i}
+    <span class="key"><i style:background="var({s.color})"></i>{s.label} <b>{shown(valueAt(values[i] ?? [], hover?.at))}</b></span>
+  {/each}
 </div>
 
 <style>

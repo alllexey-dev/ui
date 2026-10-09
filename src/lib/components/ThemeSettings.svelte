@@ -1,12 +1,14 @@
 <script lang="ts">
-  import { seeds, variantLabels, variants } from "../theme/index.js";
-  import type { ThemeMode, ThemeStore } from "../theme/store.svelte.js";
+  import { variants } from "../theme/scheme.js";
+  import { seeds, variantLabels, type ThemeMode } from "../theme/shared.js";
+  import { getTheme } from "../theme/store.svelte.js";
   import Dialog from "./Dialog.svelte";
   import Icon from "./Icon.svelte";
   import Shape from "./Shape.svelte";
 
   // Appearance dialog. The choice is shared by every alllexey.dev site, so the text says so.
-  let { theme, onclose }: { theme: ThemeStore; onclose: () => void } = $props();
+  let { onclose }: { onclose: () => void } = $props();
+  const theme = getTheme();
 
   const modes: { key: ThemeMode; label: string; icon: string }[] = [
     { key: "light", label: "Светлая", icon: "light_mode" },
@@ -36,7 +38,7 @@
       {/each}
       <label class="swatch custom" title="Свой цвет">
         <input type="color" value={theme.seed} aria-label="Свой цвет" onchange={(e) => theme.setSeed((e.target as HTMLInputElement).value)} />
-        <Shape shape={custom ? "cookie9" : "clover4"} size={44} color={custom ? theme.seed : "var(--md-surface-container-highest)"} fg={custom ? "#fff" : "var(--md-on-surface-variant)"}>
+        <Shape shape={custom ? "cookie9" : "clover4"} size={44} tone="neutral" color={custom ? theme.seed : undefined} fg={custom ? "#fff" : undefined}>
           <Icon name={custom ? "check" : "format_paint"} size={20} />
         </Shape>
       </label>

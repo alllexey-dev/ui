@@ -1,7 +1,7 @@
 <script lang="ts">
-  import type { Snippet } from "svelte";
+  import { onMount, type Snippet } from "svelte";
   import type { ShapeName } from "../shapes.js";
-  import type { ThemeStore } from "../theme/store.svelte.js";
+  import { getTheme } from "../theme/store.svelte.js";
   import Icon from "./Icon.svelte";
   import Shape from "./Shape.svelte";
   import ThemeSettings from "./ThemeSettings.svelte";
@@ -14,7 +14,6 @@
     subtitle = "",
     icon = "",
     shape = "cookie9",
-    theme,
     actions,
   }: {
     brand: string;
@@ -23,11 +22,10 @@
     /** Logo icon in a shape; none when empty. */
     icon?: string;
     shape?: ShapeName;
-    /** When given, the bar shows the appearance button and dialog. */
-    theme?: ThemeStore;
     actions?: Snippet;
   } = $props();
 
+  onMount(() => void getTheme()); // applies the shared theme and follows its changes; not during SSR
   let settings = $state(false);
 </script>
 
@@ -41,13 +39,11 @@
   </a>
   <div class="actions">
     {@render actions?.()}
-    {#if theme}
-      <button type="button" class="m3-icon-btn" aria-label="Оформление" title="Оформление" onclick={() => (settings = true)}><Icon name="palette" /></button>
-    {/if}
+    <button type="button" class="m3-icon-btn" aria-label="Оформление" title="Оформление" onclick={() => (settings = true)}><Icon name="palette" /></button>
   </div>
 </header>
 
-{#if settings && theme}<ThemeSettings {theme} onclose={() => (settings = false)} />{/if}
+{#if settings}<ThemeSettings onclose={() => (settings = false)} />{/if}
 
 <style>
   .m3-top-bar {

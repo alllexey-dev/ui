@@ -1,5 +1,5 @@
-import { applyTheme, type Variant } from "./index.js";
-import { variants } from "./scheme.js";
+import { applyTheme } from "./apply.js";
+import { variants, type Variant } from "./scheme.js";
 
 export type ThemeMode = "auto" | "light" | "dark";
 

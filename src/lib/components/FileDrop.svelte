@@ -93,7 +93,7 @@
     ondragleave={() => (over = false)}
     ondrop={drop}
   >
-    <Shape shape={over ? "sunny" : "cookie6"} size={44} color="var(--md-secondary-container)" fg="var(--md-on-secondary-container)"><Icon name={icon} /></Shape>
+    <Shape shape={over ? "sunny" : "cookie6"} size={44} tone="secondary"><Icon name={icon} /></Shape>
     <span class="text">
       <span class="m3-title-small">{title}</span>
       <span class="m3-body-small m3-muted" id="{id}-hint">{hint || "Нажмите, перетащите или вставьте"}</span>

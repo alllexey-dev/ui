@@ -4,10 +4,10 @@
 import "../styles/ui.css";
 import { defineIcons, iconPath } from "../icons/index.js";
 import { clipPath, shapeNames, svgPath } from "../shapes.js";
-import { applyTheme, initTheme, readChoice, seeds, variantLabels, variants, writeChoice } from "../theme/index.js";
+import { applyTheme, initTheme, onThemeChange, readChoice, seeds, variantLabels, variants, writeChoice } from "../theme/index.js";
 import { defineElements } from "../elements/index.js";
 
-const api = { applyTheme, clipPath, defineIcons, iconPath, initTheme, readChoice, seeds, shapeNames, svgPath, variantLabels, variants, writeChoice };
+const api = { applyTheme, clipPath, defineIcons, iconPath, initTheme, onThemeChange, readChoice, seeds, shapeNames, svgPath, variantLabels, variants, writeChoice };
 declare global {
   interface Window {
     m3: typeof api;

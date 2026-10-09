@@ -30,6 +30,11 @@ class Snackbars {
   dismiss(id: number): void {
     this.items = this.items.filter((s) => s.id !== id);
   }
+
+  /** Removes every snackbar (sign-out, tests). */
+  clear(): void {
+    this.items = [];
+  }
 }
 
 /** App-wide snackbar queue; render it once with <Snackbars />. At most three are visible. */

@@ -1,5 +1,8 @@
 <script lang="ts">
-  import { LoadingIndicator, PageHeader, Shape, StatusShape, WavyProgress, shapeNames, type ShapeName } from "../../src/lib/index.js";
+  import { Avatar, Icon, LoadingIndicator, PageHeader, Shape, StatusShape, WavyProgress, shapeNames, statusRole, type ShapeName, type ShapeTone, type StatusTone } from "../../src/lib/index.js";
+
+  const tones: ShapeTone[] = ["primary", "secondary", "tertiary", "success", "warning", "error", "neutral"];
+  const statuses: [StatusTone, string][] = [["ok", "работает"], ["warn", "запускается"], ["bad", "ошибка"], ["neutral", "остановлен"]];
 
   let morph = $state<ShapeName>("cookie9");
   let value = $state(62);
@@ -39,10 +42,22 @@
 <section class="m3-card">
   <h2 class="m3-section-title">Статусы</h2>
   <div class="row">
-    <span class="status"><StatusShape tone="ok" />работает</span>
-    <span class="status"><StatusShape tone="warn" />запускается</span>
-    <span class="status"><StatusShape tone="bad" />ошибка</span>
-    <span class="status"><StatusShape tone="off" />остановлен</span>
+    {#each statuses as [tone, text]}<StatusShape {tone}>{text}</StatusShape>{/each}
+  </div>
+  <div class="row">
+    {#each statuses as [tone, text]}<Shape tone={statusRole[tone]} size={44} shape="cookie6"><Icon name={tone === "ok" ? "check_circle" : tone === "neutral" ? "info" : tone === "warn" ? "warning" : "error"} /></Shape>{/each}
+  </div>
+</section>
+
+<section class="m3-card">
+  <h2 class="m3-section-title">Тона и аватары</h2>
+  <div class="row">
+    {#each tones as tone}<Shape {tone} size={56}><span class="m3-label-small">{tone.slice(0, 3)}</span></Shape>{/each}
+  </div>
+  <div class="row">
+    <Avatar name="Алексей Макаров" size={48} />
+    <Avatar name="guest" tone="secondary" shape="sunny" size={48} />
+    <Avatar name="Битая ссылка" src="/missing.png" tone="primary" size={48} />
   </div>
 </section>
 
@@ -54,6 +69,5 @@
   .tile.active { color: var(--md-primary); }
   .morph { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
   .row { display: flex; flex-wrap: wrap; align-items: center; gap: 32px; }
-  .status { display: inline-flex; align-items: center; gap: 8px; }
   input[type="range"] { accent-color: var(--md-primary); max-width: 320px; }
 </style>

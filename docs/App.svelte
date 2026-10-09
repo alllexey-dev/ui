@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { theme } from "./theme.js";
-  import { Account, AppShell, Page, Snackbars, snackbars } from "../src/lib/index.js";
+  import "./theme.js";
+  import { Account, AppShell, Icon, Page, Snackbars, snackbars } from "../src/lib/index.js";
   import Foundations from "./pages/Foundations.svelte";
   import Actions from "./pages/Actions.svelte";
   import Expressive from "./pages/Expressive.svelte";
@@ -24,8 +24,12 @@
 
 <svelte:window onhashchange={() => (hash = location.hash.slice(2))} />
 
-<AppShell brand="@alllexey/ui" brandHref="#/" {items} {theme} fab={{ label: "Главное действие", icon: "add", onclick: () => snackbars.show("FAB - для главного действия приложения") }}>
-  {#snippet account()}<Account name="alllexey" status="на связи" tone="ok" />{/snippet}
+<AppShell brand="@alllexey/ui" brandHref="#/" {items} fab={{ label: "Главное действие", icon: "add", onclick: () => snackbars.show("FAB - для главного действия приложения") }}>
+  {#snippet account()}
+    <Account name="alllexey" status="на связи" tone="ok" href="#/">
+      {#snippet actions()}<button class="m3-icon-btn" aria-label="Выйти" onclick={() => snackbars.show("Вышли")}><Icon name="logout" /></button>{/snippet}
+    </Account>
+  {/snippet}
   {#key current.key}
     <Page><current.page /></Page>
   {/key}

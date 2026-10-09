@@ -1,5 +1,5 @@
 // Generates src/lib/icons/builtin.ts: path data of the Material Symbols Rounded icons the package itself uses.
-// Projects add their own with defineIcons(); `node scripts/icons.mjs name ...` prints entries to paste.
+// Apps register their own with defineIcons() (see README). Run after changing the lists: node scripts/icons.mjs
 import { readFileSync, writeFileSync } from "node:fs";
 
 const builtin = [
@@ -15,11 +15,6 @@ const pathOf = (name) => {
   return svg.match(/ d="([^"]+)"/)[1];
 };
 
-const extra = process.argv.slice(2);
-if (extra.length) {
-  for (const name of extra) console.log(`  ${JSON.stringify(name)}: ${JSON.stringify(pathOf(name))},`);
-  process.exit(0);
-}
 const entries = [...builtin.map((n) => [n, pathOf(n)]), ...filled.map((n) => [`${n}-fill`, pathOf(`${n}-fill`)])];
 writeFileSync(
   new URL("../src/lib/icons/builtin.ts", import.meta.url),

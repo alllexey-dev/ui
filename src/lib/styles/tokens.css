@@ -46,5 +46,3 @@
 
   --md-chart-grid: color-mix(in srgb, var(--md-outline-variant) 70%, transparent);
 }
-:root[data-theme="dark"] { color-scheme: dark; }
-@media (prefers-color-scheme: dark) { :root:not([data-theme]) { --md-surface: #141218; --md-on-surface: #e6e0e9; color-scheme: dark; } }

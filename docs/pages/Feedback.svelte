@@ -1,11 +1,25 @@
 <script lang="ts">
-  import { ConfirmDialog, Dialog, EmptyState, LoadingOverlay, PageHeader, snackbars } from "../../src/lib/index.js";
+  import { ConfirmDialog, Dialog, EmptyState, Loadable, LoadingOverlay, PageHeader, Resource, snackbars } from "../../src/lib/index.js";
 
   let confirm = $state<"" | "plain" | "danger">("");
   let info = $state(false);
   let details = $state(false);
   let nested = $state(false);
   let loading = $state(false);
+  let busy = $state(false);
+
+  // A fake request: slow, and every third call fails, to show every state of Loadable.
+  let calls = 0;
+  const stacks = new Resource("docs/stacks", () => new Promise<string[]>((resolve, reject) => {
+    const fail = ++calls % 3 === 0;
+    setTimeout(() => (fail ? reject(new Error("timeout")) : resolve(["console", "edge", "auth"].slice(0, 1 + (calls % 3)))), 900);
+  }));
+  void stacks.load();
+
+  function restart() {
+    busy = true;
+    setTimeout(() => ((busy = false), (confirm = ""), snackbars.show("Стек перезапущен")), 1200);
+  }
 
   function reload() {
     loading = true;
@@ -47,6 +61,20 @@
   </LoadingOverlay>
 </section>
 
+<section class="m3-card">
+  <div class="m3-section-head">
+    <h2 class="m3-section-title">Данные из запроса</h2>
+    <button class="m3-btn tonal small" onclick={() => stacks.load()}>Обновить</button>
+  </div>
+  <Loadable resource={stacks} loadingLabel="Загружаем стеки" errorTitle="Не удалось загрузить стеки">
+    {#snippet children(names)}
+      <ul class="m3-segmented">
+        {#each names as name}<li class="m3-list-item"><span class="main"><span class="headline">{name}</span></span></li>{/each}
+      </ul>
+    {/snippet}
+  </Loadable>
+</section>
+
 <section class="grid">
   <div class="m3-card"><EmptyState title="Пока пусто" text="Здесь появятся запросы, когда они будут." icon="inbox" /></div>
   <div class="m3-card"><EmptyState error title="Не удалось загрузить" text="Сервер не ответил за 10 секунд."><button class="m3-btn tonal" onclick={() => snackbars.show("Повторяем…")}>Повторить</button></EmptyState></div>
@@ -75,7 +103,8 @@
     confirmLabel={confirm === "danger" ? "Удалить" : "Перезапустить"}
     danger={confirm === "danger"}
     requireText={confirm === "danger" ? "itmowidgets" : ""}
-    onconfirm={() => ((confirm = ""), snackbars.show("Готово"))}
+    {busy}
+    onconfirm={() => (confirm === "plain" ? restart() : ((confirm = ""), snackbars.show("Готово")))}
     oncancel={() => (confirm = "")}
   />
 {/if}

@@ -1,29 +1,34 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { clipPath, type ShapeName } from "../shapes.js";
+  import { animateLoading, restingClipPath } from "../loading.js";
 
   // M3 Expressive loading indicator: an active indicator that morphs through shapes while rotating.
-  let { size = 48, contained = false, label = "", color = "" }: { size?: number; contained?: boolean; label?: string; color?: string } = $props();
-  const sequence: ShapeName[] = ["softBurst", "cookie9", "pentagon", "pill", "sunny", "cookie4", "gem"];
+  // `block` centres it in a block as large as EmptyState, for a page or section waiting for its first data.
+  let {
+    size = 48,
+    contained = false,
+    block = false,
+    label = "",
+    color = "",
+  }: { size?: number; contained?: boolean; block?: boolean; label?: string; color?: string } = $props();
   let el: HTMLSpanElement;
 
   onMount(() => {
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const frames = [...sequence, sequence[0]].map((shape, i) => ({ clipPath: clipPath(shape), rotate: `${i * 140}deg` }));
-    const animation = el.animate(frames, { duration: 650 * sequence.length, iterations: Infinity, easing: "cubic-bezier(0.38, 1.21, 0.22, 1)" });
-    return () => animation.cancel();
+    const animation = animateLoading(el);
+    return () => animation?.cancel();
   });
 </script>
 
-<span class="wrap" role="status" aria-label={label || "Загрузка"}>
+<span class="wrap" class:block role="status" aria-label={label || "Загрузка"}>
   <span class="box" class:contained style:width="{size}px" style:height="{size}px">
-    <span class="indicator" bind:this={el} style:clip-path={clipPath(sequence[0])} style:background={color || undefined}></span>
+    <span class="indicator" bind:this={el} style:clip-path={restingClipPath} style:background={color || undefined}></span>
   </span>
   {#if label}<span class="label">{label}</span>{/if}
 </span>
 
 <style>
   .wrap { display: inline-flex; flex-direction: column; align-items: center; gap: 12px; }
+  .wrap.block { display: flex; justify-content: center; padding: 40px 24px; }
   .box { display: grid; place-items: center; border-radius: 50%; }
   .box.contained { background: var(--md-primary-container); }
   .indicator { width: 72%; height: 72%; background: var(--md-primary); }

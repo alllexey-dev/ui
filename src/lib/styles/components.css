@@ -4,7 +4,7 @@
    no long-press callout on controls, no text inflation on rotation. */
 html { -webkit-tap-highlight-color: transparent; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 a, button, input, label, select, textarea, summary, [role="button"] { touch-action: manipulation; }
-.m3-btn, .m3-icon-btn, .m3-fab, .m3-chip, .m3-group > button, .m3-tabs > button { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+.m3-btn, .m3-icon-btn, .m3-fab, .m3-chip, .m3-group > button, .m3-tabs > :is(button, a) { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
 html, body { margin: 0; background: var(--md-surface); color: var(--md-on-surface); font: var(--md-body-medium); -webkit-font-smoothing: antialiased; }
 body { min-height: 100vh; min-height: 100dvh; transition: background 0.3s var(--md-effects-default); }
 a { color: inherit; text-decoration: none; }
@@ -38,15 +38,33 @@ h1, h2, h3, h4 { margin: 0; font-weight: 400; }
 .m3-warn { color: var(--md-warning); }
 .m3-bad { color: var(--md-error); }
 
-/* ---------- state layer ---------- */
+/* ---------- state layer ----------
+   Hover and press tint an interactive surface with its own text colour. Add `m3-state` to a custom control to
+   give it the same layer. Clickable rows are a, button, or a div with role="button" or "link" when the row holds
+   its own controls. :where() keeps specificity at zero, so apps override all of this without fighting it. */
 .m3-state { position: relative; isolation: isolate; }
-.m3-state::before {
+:where(
+  .m3-state, .m3-btn, .m3-icon-btn, .m3-fab, .m3-chip, .m3-group > button,
+  .m3-list-item:is(a, button, [role="button"], [role="link"]),
+  .m3-table .tr:is(a, button, [role="button"], [role="link"])
+)::before {
   content: ""; position: absolute; inset: 0; border-radius: inherit; background: currentColor; opacity: 0; z-index: -1;
   transition: opacity 0.15s var(--md-effects-fast);
 }
-@media (hover: hover) { .m3-state:hover::before { opacity: 0.08; } }
-.m3-state:focus-visible::before, .m3-state:active::before { opacity: 0.12; }
-.m3-state:focus-visible { outline: 3px solid var(--md-secondary); outline-offset: 2px; }
+@media (hover: hover) {
+  :where(
+    .m3-state, .m3-btn, .m3-icon-btn, .m3-fab, .m3-chip, .m3-group > button,
+    .m3-list-item:is(a, button, [role="button"], [role="link"]),
+    .m3-table .tr:is(a, button, [role="button"], [role="link"])
+  ):hover::before { opacity: 0.08; }
+}
+:where(
+  .m3-state, .m3-btn, .m3-icon-btn, .m3-fab, .m3-chip, .m3-group > button,
+  .m3-list-item:is(a, button, [role="button"], [role="link"]),
+  .m3-table .tr:is(a, button, [role="button"], [role="link"])
+):active::before { opacity: 0.12; }
+:where(.m3-state, .m3-btn, .m3-icon-btn, .m3-fab, .m3-chip, .m3-group > button):disabled::before { display: none; }
+:where(.m3-state, .m3-btn, .m3-icon-btn, .m3-fab, .m3-chip, .m3-group > button):focus-visible { outline: 3px solid var(--md-secondary); outline-offset: 2px; }
 
 /* ---------- buttons (pill that squares up when pressed) ---------- */
 .m3-btn {
@@ -56,12 +74,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 400; }
   background: var(--md-primary); color: var(--md-on-primary);
   transition: border-radius 0.35s var(--md-spring-fast), background 0.2s, box-shadow 0.2s, transform 0.35s var(--md-spring-fast);
 }
-.m3-btn::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: currentColor; opacity: 0; z-index: -1; transition: opacity 0.15s; }
-@media (hover: hover) { .m3-btn:hover::before { opacity: 0.08; } }
-.m3-btn:active::before { opacity: 0.12; }
 .m3-btn:active:not(:disabled) { border-radius: var(--md-shape-md); }
-.m3-btn:focus-visible { outline: 3px solid var(--md-secondary); outline-offset: 2px; }
-.m3-btn:disabled { background: color-mix(in srgb, var(--md-on-surface) 10%, transparent); color: color-mix(in srgb, var(--md-on-surface) 38%, transparent); cursor: not-allowed; box-shadow: none; }
 .m3-btn svg { width: 20px; height: 20px; margin-left: -6px; }
 .m3-btn.tonal { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
 .m3-btn.tertiary { background: var(--md-tertiary-container); color: var(--md-on-tertiary-container); }
@@ -73,6 +86,8 @@ h1, h2, h3, h4 { margin: 0; font-weight: 400; }
 .m3-btn.small { height: 32px; padding: 0 16px; font: var(--md-label-large); border-radius: 16px; }
 .m3-btn.large { height: 56px; padding: 0 28px; font: var(--md-title-medium); border-radius: 28px; }
 .m3-btn.large:active:not(:disabled) { border-radius: var(--md-shape-lg); }
+/* after the variants, so a disabled danger or tonal button does not look active */
+.m3-btn:disabled { background: color-mix(in srgb, var(--md-on-surface) 10%, transparent); color: color-mix(in srgb, var(--md-on-surface) 38%, transparent); cursor: not-allowed; box-shadow: none; }
 
 /* icon buttons */
 .m3-icon-btn {
@@ -80,12 +95,8 @@ h1, h2, h3, h4 { margin: 0; font-weight: 400; }
   border: none; border-radius: 20px; background: transparent; color: var(--md-on-surface-variant);
   transition: border-radius 0.35s var(--md-spring-fast), background 0.2s, color 0.2s;
 }
-.m3-icon-btn::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: currentColor; opacity: 0; z-index: -1; transition: opacity 0.15s; }
-@media (hover: hover) { .m3-icon-btn:hover::before { opacity: 0.08; } }
-.m3-icon-btn:active::before { opacity: 0.12; }
 .m3-icon-btn:active:not(:disabled) { border-radius: var(--md-shape-md); }
 .m3-icon-btn:disabled { color: color-mix(in srgb, var(--md-on-surface) 38%, transparent); cursor: not-allowed; }
-.m3-icon-btn:focus-visible { outline: 3px solid var(--md-secondary); outline-offset: 2px; }
 .m3-icon-btn.filled { background: var(--md-primary); color: var(--md-on-primary); }
 .m3-icon-btn.tonal { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
 .m3-icon-btn.outlined { box-shadow: inset 0 0 0 1px var(--md-outline-variant); }
@@ -104,11 +115,10 @@ h1, h2, h3, h4 { margin: 0; font-weight: 400; }
 .m3-group > button:first-child { border-radius: var(--group-pill) var(--md-shape-sm) var(--md-shape-sm) var(--group-pill); }
 .m3-group > button:last-child { border-radius: var(--md-shape-sm) var(--group-pill) var(--group-pill) var(--md-shape-sm); }
 .m3-group > button.active { background: var(--md-primary); color: var(--md-on-primary); border-radius: var(--group-pill); }
-.m3-group > button::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: currentColor; opacity: 0; z-index: -1; transition: opacity 0.15s; }
-@media (hover: hover) { .m3-group > button:hover::before { opacity: 0.08; } }
-.m3-group > button:active::before { opacity: 0.12; }
 .m3-group > button:disabled { opacity: 0.38; cursor: not-allowed; }
 .m3-group.small > button { height: 32px; padding: 0 12px; }
+.m3-group.fill { display: flex; width: 100%; }
+.m3-group.fill > button { flex: 1; min-width: 0; justify-content: center; }
 .m3-group svg { width: 18px; height: 18px; }
 
 /* FAB */
@@ -118,8 +128,6 @@ h1, h2, h3, h4 { margin: 0; font-weight: 400; }
   font: var(--md-label-large); box-shadow: var(--md-elevation-3);
   transition: border-radius 0.35s var(--md-spring-fast), box-shadow 0.2s, transform 0.35s var(--md-spring-fast);
 }
-.m3-fab::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: currentColor; opacity: 0; z-index: -1; }
-@media (hover: hover) { .m3-fab:hover::before { opacity: 0.08; } }
 .m3-fab:active { border-radius: var(--md-shape-xl); transform: scale(0.96); }
 
 /* chips */
@@ -129,12 +137,10 @@ h1, h2, h3, h4 { margin: 0; font-weight: 400; }
   background: transparent; color: var(--md-on-surface-variant); font: var(--md-label-large); white-space: nowrap;
   transition: background 0.2s, border-radius 0.35s var(--md-spring-fast), padding 0.35s var(--md-spring-fast);
 }
-.m3-chip::before { content: ""; position: absolute; inset: 0; border-radius: inherit; background: currentColor; opacity: 0; z-index: -1; transition: opacity 0.15s; }
-@media (hover: hover) { .m3-chip:hover::before { opacity: 0.08; } }
-.m3-chip:active::before { opacity: 0.12; }
 .m3-chip.selected { background: var(--md-secondary-container); color: var(--md-on-secondary-container); box-shadow: none; padding-left: 8px; border-radius: var(--md-shape-lg); }
 .m3-chip svg { width: 18px; height: 18px; }
 .m3-chip .count { font: var(--md-label-medium); opacity: 0.75; }
+.m3-chips { display: flex; flex-wrap: wrap; gap: 8px; }
 
 /* badges/pills used as status labels */
 .m3-pill { display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 10px; border-radius: var(--md-shape-full); font: var(--md-label-medium); white-space: nowrap; }
@@ -163,28 +169,32 @@ a.m3-card, button.m3-card { display: block; text-align: left; border: none; tran
 a.m3-card:active, button.m3-card:active { border-radius: var(--md-shape-xl-inc); }
 
 /* lists */
-.m3-list { display: flex; flex-direction: column; }
+.m3-list { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
 .m3-list-item {
   position: relative; isolation: isolate; display: flex; align-items: center; gap: 16px; min-height: 56px; padding: 8px 16px 8px 16px;
   border: none; background: transparent; text-align: left; width: 100%; color: inherit;
 }
-a.m3-list-item::before, button.m3-list-item::before { content: ""; position: absolute; inset: 0; background: var(--md-on-surface); opacity: 0; z-index: -1; transition: opacity 0.15s; border-radius: inherit; }
-@media (hover: hover) { a.m3-list-item:hover::before, button.m3-list-item:hover::before { opacity: 0.08; } }
-a.m3-list-item:active::before, button.m3-list-item:active::before { opacity: 0.12; }
 .m3-list-item .lead { flex: none; }
 .m3-list-item .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .m3-list-item .headline { font: var(--md-body-large); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .m3-list-item .support { font: var(--md-body-medium); color: var(--md-on-surface-variant); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .m3-list-item .trail { flex: none; font: var(--md-label-medium); color: var(--md-on-surface-variant); text-align: right; }
 .m3-list.divided > * + * { border-top: 1px solid var(--md-outline-variant); }
+/* long headlines and support lines wrap instead of being cut; on narrow screens the trail moves under the text */
+.m3-list-item.wrap { flex-wrap: wrap; }
+.m3-list-item.wrap :is(.headline, .support) { white-space: normal; overflow-wrap: anywhere; }
+@media (max-width: 520px) { .m3-list-item.wrap > .trail { flex-basis: 100%; text-align: left; } }
 /* expressive segmented list: items are separate rounded tiles with 2px gaps */
-.m3-segmented { display: flex; flex-direction: column; gap: 2px; }
+.m3-segmented { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; list-style: none; }
 .m3-segmented > * { background: var(--md-surface-container); border-radius: var(--md-shape-xs); }
 .m3-segmented > *:first-child { border-top-left-radius: var(--md-shape-xl); border-top-right-radius: var(--md-shape-xl); }
 .m3-segmented > *:last-child { border-bottom-left-radius: var(--md-shape-xl); border-bottom-right-radius: var(--md-shape-xl); }
 .m3-segmented > a, .m3-segmented > button { transition: border-radius 0.35s var(--md-spring-fast); }
 @media (hover: hover) { .m3-segmented > a:hover, .m3-segmented > button:hover { border-radius: var(--md-shape-lg); } }
 .m3-segmented > a:active, .m3-segmented > button:active { border-radius: var(--md-shape-lg); }
+/* inside a card the tiles would melt into it: they take a surface one step away from the card's */
+.m3-card .m3-segmented > * { background: var(--md-surface-container-lowest); }
+[data-theme="dark"] .m3-card .m3-segmented > * { background: var(--md-surface-container-high); }
 
 /* fields */
 .m3-search {
@@ -194,6 +204,8 @@ a.m3-list-item:active::before, button.m3-list-item:active::before { opacity: 0.1
 .m3-search input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; color: var(--md-on-surface); font: var(--md-body-large); }
 .m3-search input::placeholder { color: var(--md-on-surface-variant); }
 .m3-search:focus-within { box-shadow: inset 0 0 0 2px var(--md-primary); }
+.m3-search.compact { height: 40px; gap: 8px; padding: 0 8px 0 12px; }
+.m3-search input::-webkit-search-cancel-button { display: none; }
 .m3-field {
   height: 56px; padding: 0 16px; border-radius: var(--md-shape-xs) var(--md-shape-xs) 0 0; border: none;
   border-bottom: 1px solid var(--md-on-surface-variant); background: var(--md-surface-container-highest);
@@ -212,18 +224,22 @@ textarea.m3-field { height: auto; min-height: 112px; padding: 14px 16px; resize:
 .m3-text-field.invalid > label, .m3-text-field.invalid > .note { color: var(--md-error); }
 
 /* tabs */
-.m3-tabs { display: flex; gap: 0; border-bottom: 1px solid var(--md-surface-container-highest); }
-.m3-tabs > button {
+.m3-tabs { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--md-surface-container-highest); }
+.m3-tabs > :is(button, a) {
   position: relative; display: inline-flex; align-items: center; gap: 8px; height: 48px; padding: 0 20px; border: none; background: none;
   font: var(--md-title-small); color: var(--md-on-surface-variant);
 }
-.m3-tabs > button.active { color: var(--md-primary); }
-.m3-tabs > button::after {
+.m3-tabs > :is(button, a).active { color: var(--md-primary); }
+.m3-tabs > :is(button, a)::after {
   content: ""; position: absolute; left: 50%; bottom: 0; height: 3px; width: 0; border-radius: 3px 3px 0 0; background: var(--md-primary);
   transform: translateX(-50%); transition: width 0.4s var(--md-spring-fast);
 }
-.m3-tabs > button.active::after { width: calc(100% - 24px); }
-@media (hover: hover) { .m3-tabs > button:hover { color: var(--md-on-surface); } }
+.m3-tabs > :is(button, a).active::after { width: calc(100% - 24px); }
+@media (hover: hover) { .m3-tabs > :is(button, a):hover { color: var(--md-on-surface); } }
+.m3-tabs > :is(button, a) { flex: none; white-space: nowrap; }
+.m3-tabs > :is(button, a):focus-visible { outline: 3px solid var(--md-secondary); outline-offset: -3px; border-radius: var(--md-shape-sm); }
+.m3-tabs .badge { min-width: 20px; height: 20px; padding: 0 6px; border-radius: 10px; display: inline-grid; place-items: center; font: var(--md-label-small); font-variant-numeric: tabular-nums; background: var(--md-surface-container-highest); color: var(--md-on-surface-variant); }
+.m3-tabs > .active .badge { background: var(--md-primary); color: var(--md-on-primary); }
 
 /* switch */
 .m3-switch { position: relative; display: inline-block; width: 52px; height: 32px; flex: none; }
@@ -236,23 +252,50 @@ textarea.m3-field { height: auto; min-height: 112px; padding: 14px 16px; resize:
 .m3-switch.danger input:checked + .track .thumb { background: var(--md-on-error); }
 .m3-switch input:active + .track .thumb { width: 28px; height: 28px; top: 2px; left: 2px; }
 .m3-switch input:checked:active + .track .thumb { left: 22px; }
+.m3-switch:has(input:disabled) { opacity: 0.38; }
+.m3-switch input:disabled { cursor: not-allowed; }
+/* Switch with visible text: the whole row toggles it */
+.m3-switch-label { display: inline-flex; align-items: center; gap: 12px; cursor: pointer; }
 
 /* page header */
 .m3-page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
 .m3-page-head h1 { font: var(--md-display-small); font-weight: 500; font-stretch: 108%; letter-spacing: -0.5px; }
 .m3-page-head p { margin: 8px 0 0; font: var(--md-body-large); color: var(--md-on-surface-variant); max-width: 760px; }
 .m3-section-title { font: var(--md-title-large); margin: 0 0 12px; }
+/* a section or card heading with actions on the right; the title gives up its own margin */
+.m3-section-head { display: flex; align-items: center; justify-content: space-between; gap: 8px 16px; flex-wrap: wrap; margin-bottom: 12px; }
+.m3-section-head > .m3-section-title { margin: 0; }
+.m3-card.flush > .m3-section-head { padding: 20px 24px 0; }
+
+/* key-value facts: <dl class="m3-details"><dt>Образ</dt><dd>...</dd>...</dl> */
+.m3-details { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 8px 24px; margin: 0; }
+.m3-details > dt { font: var(--md-label-large); color: var(--md-on-surface-variant); }
+.m3-details > dd { margin: 0; min-width: 0; overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .m3-details { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  .m3-details > dd + dt { margin-top: 10px; }
+}
+
+/* a headline number: <div class="m3-stat"><span class="label">...</span><span class="value">...</span><span class="support">...</span></div> */
+.m3-stat { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.m3-stat > .label { font: var(--md-label-large); color: var(--md-on-surface-variant); }
+.m3-stat > .value { font: var(--md-headline-large); font-variant-numeric: tabular-nums; }
+.m3-stat > .support { font: var(--md-body-small); color: var(--md-on-surface-variant); }
 
 /* data tables inside cards */
 .m3-table { width: 100%; overflow-x: auto; }
 .m3-table .tr { display: grid; gap: 16px; padding: 12px 20px; align-items: center; font: var(--md-body-medium); }
-.m3-table .tr + .tr { border-top: 1px solid var(--md-outline-variant); }
 .m3-table .th { font: var(--md-label-large); color: var(--md-on-surface-variant); }
-.m3-table a.tr, .m3-table button.tr { position: relative; isolation: isolate; border: none; background: none; text-align: left; width: 100%; color: inherit; }
-.m3-table a.tr::before, .m3-table button.tr::before { content: ""; position: absolute; inset: 0; background: var(--md-on-surface); opacity: 0; z-index: -1; transition: opacity 0.15s; }
-@media (hover: hover) { .m3-table a.tr:hover::before, .m3-table button.tr:hover::before { opacity: 0.06; } }
-.m3-table a.tr:active::before, .m3-table button.tr:active::before { opacity: 0.1; }
+/* clickable rows: a, button or, when the row holds its own controls, a div with role="button" or "link" */
+.m3-table .tr:is(a, button, [role="button"], [role="link"]) { position: relative; isolation: isolate; border: none; background: none; text-align: left; width: 100%; color: inherit; cursor: pointer; }
+.m3-table .tr.selected { background: var(--md-secondary-container); color: var(--md-on-secondary-container); }
+/* after the clickable-row reset, which would otherwise remove it */
+.m3-table .tr + .tr { border-top: 1px solid var(--md-outline-variant); }
 .m3-clip { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+/* several lines, then an ellipsis: class="m3-clamp" style="--lines: 3" */
+.m3-clamp { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: var(--lines, 2); line-clamp: var(--lines, 2); overflow: hidden; overflow-wrap: anywhere; }
+/* text for screen readers only */
+.m3-sr-only { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .m3-empty { padding: 32px; text-align: center; color: var(--md-on-surface-variant); }
 
 pre.m3-code { margin: 0; padding: 14px 16px; border-radius: var(--md-shape-lg); background: var(--md-surface-container-highest); font: 13px/1.6 var(--md-mono); white-space: pre-wrap; word-break: break-word; }
@@ -261,9 +304,6 @@ pre.m3-code { margin: 0; padding: 14px 16px; border-radius: var(--md-shape-lg); 
 ::-webkit-scrollbar { width: 12px; height: 12px; }
 ::-webkit-scrollbar-thumb { background: color-mix(in srgb, var(--md-on-surface) 22%, transparent); border-radius: 12px; border: 4px solid transparent; background-clip: padding-box; }
 ::-webkit-scrollbar-track { background: transparent; }
-
-
-
 /* ---------- dialogs ---------- */
 .m3-scrim { position: fixed; inset: 0; z-index: 100; overscroll-behavior: contain; display: grid; place-items: center; background: color-mix(in srgb, var(--md-scrim) 40%, transparent); animation: m3-fade 0.2s; }
 .m3-dialog {

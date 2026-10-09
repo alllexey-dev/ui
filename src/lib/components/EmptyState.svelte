@@ -16,7 +16,7 @@
 </script>
 
 <div class="state" role={error ? "alert" : undefined}>
-  <Shape {shape} size={72} color={error ? "var(--md-error-container)" : "var(--md-surface-container-highest)"} fg={error ? "var(--md-on-error-container)" : "var(--md-on-surface-variant)"}>
+  <Shape {shape} size={72} tone={error ? "error" : "neutral"}>
     <Icon name={error ? "error" : icon} size={32} />
   </Shape>
   <div class="m3-title-medium">{title}</div>

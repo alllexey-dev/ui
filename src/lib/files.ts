@@ -20,9 +20,9 @@ export function isImage(file: { name: string; type: string }): boolean {
   return file.type.startsWith("image/") || /\.(png|jpe?g|gif|webp|heic|heif|avif)$/i.test(file.name);
 }
 
-const units = ["Б", "КБ", "МБ", "ГБ"];
+const units = ["Б", "КБ", "МБ", "ГБ", "ТБ"];
 
-/** "1,5 МБ": binary units with a Russian decimal comma, for file limits and sizes. */
+/** "1,5 МБ": binary units with a Russian decimal comma, for file sizes, limits and disk usage. */
 export function fileSize(bytes: number): string {
   if (!Number.isFinite(bytes) || bytes <= 0) return "0 Б";
   const exp = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1);

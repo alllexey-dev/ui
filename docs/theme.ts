@@ -1,5 +1,5 @@
-import { createTheme, defineIcons } from "../src/lib/index.js";
+import { defineIcons, getTheme } from "../src/lib/index.js";
 import { docsIcons } from "./icons.js";
 
 defineIcons(docsIcons);
-export const theme = createTheme();
+export const theme = getTheme();

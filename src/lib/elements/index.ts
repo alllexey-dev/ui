@@ -1,7 +1,8 @@
 // Framework-free custom elements for pages without Svelte (cringetrader, static sites):
 // <m3-shape>, <m3-loading-indicator> and <m3-progress>. Importing this module registers them.
+import { animateLoading, restingClipPath } from "../loading.js";
+import { createFollower, progressColors, progressGeometry } from "../progress.js";
 import { clipPath, shapeNames, type ShapeName } from "../shapes.js";
-import { createFollower, progressGeometry } from "../progress.js";
 
 const isShape = (value: string | null): value is ShapeName => !!value && (shapeNames as string[]).includes(value);
 const number = (value: string | null, fallback: number) => (value !== null && Number.isFinite(Number(value)) ? Number(value) : fallback);
@@ -57,8 +58,6 @@ export class M3Shape extends Base {
   }
 }
 
-const sequence: ShapeName[] = ["softBurst", "cookie9", "pentagon", "pill", "sunny", "cookie4", "gem"];
-
 /** <m3-loading-indicator size="48" contained label="Загрузка"></m3-loading-indicator> */
 export class M3LoadingIndicator extends Base {
   static observedAttributes = ["size", "contained", "label"];
@@ -82,7 +81,7 @@ export class M3LoadingIndicator extends Base {
     root.adoptedStyleSheets = [sheet(M3LoadingIndicator.css)];
     this.#box = Object.assign(document.createElement("span"), { className: "box" });
     this.#indicator = Object.assign(document.createElement("span"), { className: "indicator" });
-    this.#indicator.style.clipPath = clipPath(sequence[0]);
+    this.#indicator.style.clipPath = restingClipPath;
     this.#label = Object.assign(document.createElement("span"), { className: "label" });
     this.#box.append(this.#indicator);
     root.append(this.#box, this.#label);
@@ -91,9 +90,7 @@ export class M3LoadingIndicator extends Base {
   connectedCallback() {
     this.setAttribute("role", "status");
     this.#render();
-    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    const frames = [...sequence, sequence[0]].map((shape, i) => ({ clipPath: clipPath(shape), rotate: `${i * 140}deg` }));
-    this.#animation = this.#indicator.animate(frames, { duration: 650 * sequence.length, iterations: Infinity, easing: "cubic-bezier(0.38, 1.21, 0.22, 1)" });
+    this.#animation = animateLoading(this.#indicator);
   }
 
   disconnectedCallback() {
@@ -180,20 +177,18 @@ export class M3Progress extends Base {
     const width = this.clientWidth;
     const thickness = number(this.getAttribute("thickness"), 4);
     const g = progressGeometry(shown, width, thickness, !this.hasAttribute("flat"));
-    const tone = this.getAttribute("tone") || "primary";
-    const color = `var(--md-${tone})`;
-    const trackColor = tone === "primary" ? "var(--md-secondary-container)" : `var(--md-${tone}-container)`;
+    const { indicator, track } = progressColors(this.getAttribute("tone") || "primary");
     this.style.height = `${g.height}px`;
     this.#svg.setAttribute("width", String(width));
     this.#svg.setAttribute("height", String(g.height));
     this.#track.style.display = this.#stop.style.display = g.track ? "" : "none";
     if (g.track) {
-      for (const [k, v] of Object.entries({ x1: g.track.x1, x2: g.track.x2, y1: g.mid, y2: g.mid, stroke: trackColor, "stroke-width": thickness })) this.#track.setAttribute(k, String(v));
-      for (const [k, v] of Object.entries({ cx: g.track.x2, cy: g.mid, r: thickness / 2, fill: color })) this.#stop.setAttribute(k, String(v));
+      for (const [k, v] of Object.entries({ x1: g.track.x1, x2: g.track.x2, y1: g.mid, y2: g.mid, stroke: track, "stroke-width": thickness })) this.#track.setAttribute(k, String(v));
+      for (const [k, v] of Object.entries({ cx: g.track.x2, cy: g.mid, r: thickness / 2, fill: indicator })) this.#stop.setAttribute(k, String(v));
     }
     this.#active.style.display = g.active ? "" : "none";
     if (g.active) this.#active.setAttribute("d", g.active);
-    this.#active.setAttribute("stroke", color);
+    this.#active.setAttribute("stroke", indicator);
     this.#active.setAttribute("stroke-width", String(thickness));
   }
 }

@@ -1,22 +1,21 @@
 <script lang="ts">
-  import type { Snippet } from "svelte";
+  import { onMount, type Snippet } from "svelte";
   import { lockScroll } from "../scroll-lock.js";
-  import type { ThemeStore } from "../theme/store.svelte.js";
+  import { getTheme } from "../theme/store.svelte.js";
   import Icon from "./Icon.svelte";
   import ThemeSettings from "./ThemeSettings.svelte";
 
   export type NavItem = { href: string; label: string; icon: string; active?: boolean; badge?: number | string };
   export type FabAction = { label: string; icon: string; href?: string; onclick?: () => void };
 
-  // Application frame: navigation rail (expandable on wide screens, a modal drawer on phones),
-  // top app bar on phones, theme settings and a rounded content surface. Routing stays with the app:
-  // it passes items with `active` set.
+  // Application frame: navigation rail (expandable on wide screens, a modal drawer on phones), top app bar
+  // on phones, the appearance button and a rounded content surface. Routing stays with the app: it passes
+  // items with `active` set.
   let {
     brand,
     brandHref = "/",
     items,
     fab,
-    theme,
     title,
     account,
     actions,
@@ -26,16 +25,16 @@
     brandHref?: string;
     items: NavItem[];
     fab?: FabAction;
-    /** When given, the shell shows the appearance button and dialog. */
-    theme?: ThemeStore;
     /** Top bar title on phones; defaults to the active item label. */
     title?: string;
-    /** Bottom of the rail: user, connection state and the like. */
+    /** Bottom of the rail: usually Account. Elements with class "rail-text" hide while the rail is collapsed. */
     account?: Snippet<[{ expanded: boolean }]>;
     /** Extra top bar buttons on phones. */
     actions?: Snippet;
     children: Snippet;
   } = $props();
+
+  onMount(() => void getTheme()); // applies the shared theme and follows its changes; not during SSR
 
   const storageKey = "ui-rail-expanded";
   let expanded = $state(typeof localStorage === "undefined" || localStorage.getItem(storageKey) !== "false");
@@ -111,12 +110,10 @@
       {/each}
     </nav>
     <div class="rail-bottom">
-      {#if theme}
-        <button class="item" onclick={() => (settings = true)}>
-          <span class="indicator"><Icon name="palette" /></span>
-          <span class="label">Оформление</span>
-        </button>
-      {/if}
+      <button class="item" onclick={() => (settings = true)}>
+        <span class="indicator"><Icon name="palette" /></span>
+        <span class="label">Оформление</span>
+      </button>
       {@render account?.({ expanded })}
     </div>
   </aside>
@@ -128,13 +125,13 @@
       <span class="m3-title-large m3-clip">{heading}</span>
       <span class="spacer"></span>
       {@render actions?.()}
-      {#if theme}<button class="m3-icon-btn" onclick={() => (settings = true)} aria-label="Оформление"><Icon name="palette" /></button>{/if}
+      <button class="m3-icon-btn" onclick={() => (settings = true)} aria-label="Оформление"><Icon name="palette" /></button>
     </header>
     <main>{@render children()}</main>
   </div>
 </div>
 
-{#if settings && theme}<ThemeSettings {theme} onclose={() => (settings = false)} />{/if}
+{#if settings}<ThemeSettings onclose={() => (settings = false)} />{/if}
 
 <style>
   .shell { display: grid; grid-template-columns: 96px minmax(0, 1fr); min-height: 100vh; min-height: 100dvh; transition: grid-template-columns 0.45s var(--md-spring-default); }
@@ -176,9 +173,9 @@
   .rail-bottom { margin-top: auto; display: flex; flex-direction: column; gap: 8px; padding-top: 12px; }
   /* Collapsed rail: text next to the avatar leaves the layout, so the avatar sits on the rail's axis. */
   .rail :global(.rail-text) { display: none; }
-  .rail :global(.m3-account) { justify-content: center; padding-inline: 0; }
-  .expanded .rail :global(.rail-text) { display: block; animation: m3-fade 0.3s; }
-  .expanded .rail :global(.m3-account) { justify-content: flex-start; padding-inline: 10px; }
+  .rail :global(.m3-account .who) { justify-content: center; }
+  .expanded .rail :global(.rail-text) { display: flex; animation: m3-fade 0.3s; }
+  .expanded .rail :global(.m3-account .who) { justify-content: flex-start; }
 
   .body { min-width: 0; display: flex; flex-direction: column; }
   .topbar { display: none; align-items: center; gap: 8px; height: calc(64px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) max(8px, env(safe-area-inset-right)) 0 max(8px, env(safe-area-inset-left)); position: sticky; top: 0; z-index: 10; background: var(--md-surface); }
@@ -195,7 +192,7 @@
     .expanded .rail-fab { width: 56px; }
     .expanded .fab-label, .expanded .brand { opacity: 0; }
     .expanded .rail :global(.rail-text) { display: none; }
-    .expanded .rail :global(.m3-account) { justify-content: center; padding-inline: 0; }
+    .expanded .rail :global(.m3-account .who) { justify-content: center; }
     .menu-btn { display: none; }
     .rail-top { padding-left: 4px; }
     .expanded .badge { left: calc(50% + 8px); right: auto; top: 2px; }
@@ -212,8 +209,8 @@
     .rail .item .label { position: absolute; left: 56px; font: var(--md-label-large); }
     .rail .badge { left: auto; right: 16px; top: 20px; }
     .rail .brand, .rail .fab-label { opacity: 1; }
-    .shell .rail :global(.rail-text) { display: block; }
-    .shell .rail :global(.m3-account) { justify-content: flex-start; padding-inline: 10px; }
+    .shell .rail :global(.rail-text) { display: flex; }
+    .shell .rail :global(.m3-account .who) { justify-content: flex-start; }
     .rail .rail-fab { width: calc(100% - 16px); }
     .menu-btn { display: none; }
     .close-btn { display: inline-grid; }
