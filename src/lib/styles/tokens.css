@@ -45,4 +45,56 @@
   --md-elevation-3: 0 4px 8px 3px rgb(0 0 0 / 0.15), 0 1px 3px rgb(0 0 0 / 0.3);
 
   --md-chart-grid: color-mix(in srgb, var(--md-outline-variant) 70%, transparent);
+
+  /* density: sizes of controls, rows and containers. Components read these, so a density changes them all. */
+  --md-control: 40px; /* buttons, icon buttons, button groups */
+  --md-control-small: 32px;
+  --md-control-pad: 24px; /* side padding of a filled button */
+  --md-field: 56px; /* text fields and search */
+  --md-row: 56px; /* list items */
+  --md-row-pad: 8px 16px;
+  --md-table-pad: 12px 20px;
+  --md-tab: 48px;
+  --md-chip: 32px;
+  --md-card-pad: 20px 24px;
+  --md-card-shape: var(--md-shape-xl);
+  --md-page-pad: 32px 40px;
+  --md-page-title: 500 36px/44px var(--md-font);
+  --md-page-text: var(--md-body-large);
+  --md-page-gap: 24px; /* under the page header */
+  --md-section-title: var(--md-title-large);
+  --md-stat: var(--md-headline-large);
+  --md-rail: 96px;
+  --md-rail-expanded: 240px;
+  --md-rail-item: 48px; /* height of an item in the expanded rail */
+  --md-main-gap: 12px; /* between the top of the window and the content surface */
+}
+
+/* Compact density (M3 density scale, -1 to -3 steps) for data-heavy desktop apps: <html data-density="compact">.
+   Only for precise pointers: on touch screens controls keep their full size. Containers get smaller corners
+   to match their smaller padding. */
+@media (pointer: fine) {
+  :root[data-density="compact"] {
+    --md-control: 36px;
+    --md-control-small: 28px;
+    --md-control-pad: 16px;
+    --md-field: 44px;
+    --md-row: 44px;
+    --md-row-pad: 6px 12px;
+    --md-table-pad: 8px 16px;
+    --md-tab: 40px;
+    --md-chip: 28px;
+    --md-card-pad: 14px 16px;
+    --md-card-shape: var(--md-shape-lg);
+    --md-page-pad: 20px 28px;
+    --md-page-title: 600 24px/32px var(--md-font);
+    --md-page-text: var(--md-body-medium);
+    --md-page-gap: 16px;
+    --md-section-title: var(--md-title-medium);
+    --md-stat: var(--md-headline-medium);
+    --md-rail: 80px;
+    --md-rail-expanded: 220px;
+    --md-rail-item: 40px;
+    --md-main-gap: 8px;
+  }
 }

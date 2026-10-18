@@ -18,6 +18,12 @@
   ];
 
   let hash = $state(location.hash.slice(2));
+  // Density is an attribute on <html> (tokens.css); the showcase toggles it to compare both.
+  let compact = $state(document.documentElement.dataset.density === "compact");
+  $effect(() => {
+    if (compact) document.documentElement.dataset.density = "compact";
+    else delete document.documentElement.dataset.density;
+  });
   const current = $derived(pages.find((p) => p.key === hash) ?? pages[0]);
   const items = $derived(pages.map((p) => ({ href: `#/${p.key}`, label: p.label, icon: p.icon, active: p === current, badge: p.key === "feedback" ? 3 : undefined })));
 </script>
@@ -27,7 +33,10 @@
 <AppShell brand="@alllexey/ui" brandHref="#/" {items} fab={{ label: "Главное действие", icon: "add", onclick: () => snackbars.show("FAB - для главного действия приложения") }}>
   {#snippet account()}
     <Account name="alllexey" status="на связи" tone="ok" href="#/">
-      {#snippet actions()}<button class="m3-icon-btn" aria-label="Выйти" onclick={() => snackbars.show("Вышли")}><Icon name="logout" /></button>{/snippet}
+      {#snippet actions()}
+        <button class="m3-icon-btn" class:tonal={compact} aria-label="Компактная плотность" aria-pressed={compact} title="Компактная плотность (только мышь и тачпад)" onclick={() => (compact = !compact)}><Icon name="density_small" /></button>
+        <button class="m3-icon-btn" aria-label="Выйти" onclick={() => snackbars.show("Вышли")}><Icon name="logout" /></button>
+      {/snippet}
     </Account>
   {/snippet}
   {#key current.key}

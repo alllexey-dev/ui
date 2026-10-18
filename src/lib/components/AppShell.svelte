@@ -134,21 +134,23 @@
 {#if settings}<ThemeSettings onclose={() => (settings = false)} />{/if}
 
 <style>
-  .shell { display: grid; grid-template-columns: 96px minmax(0, 1fr); min-height: 100vh; min-height: 100dvh; transition: grid-template-columns 0.45s var(--md-spring-default); }
-  .shell.expanded { grid-template-columns: 240px minmax(0, 1fr); }
+  .shell { display: grid; grid-template-columns: var(--md-rail) minmax(0, 1fr); min-height: 100vh; min-height: 100dvh; transition: grid-template-columns 0.45s var(--md-spring-default); }
+  .shell.expanded { grid-template-columns: var(--md-rail-expanded) minmax(0, 1fr); }
 
   .rail {
     position: sticky; top: 0; height: 100vh; height: 100dvh; display: flex; flex-direction: column; gap: 4px;
     padding: 12px 12px calc(16px + env(safe-area-inset-bottom)) calc(12px + env(safe-area-inset-left));
     background: var(--md-surface); overflow-y: auto; overflow-x: hidden; overscroll-behavior: contain; z-index: 20;
+    scrollbar-width: none; /* a scrollbar would eat the narrow rail's width and push the items off its axis */
   }
   .rail > * { flex-shrink: 0; }
-  .rail-top { display: flex; align-items: center; gap: 8px; height: 56px; padding-left: 16px; }
+  /* the menu button and the FAB sit on the rail's axis whatever its width (density) */
+  .rail-top { display: flex; align-items: center; gap: 8px; height: 56px; padding-left: calc((var(--md-rail) - 24px - var(--md-control)) / 2); }
   .close-btn { display: none; }
   .brand { white-space: nowrap; opacity: 0; transition: opacity 0.2s; }
   .expanded .brand { opacity: 1; }
-  .rail-fab { margin: 8px 0 16px 8px; width: 56px; overflow: hidden; transition: width 0.45s var(--md-spring-default), border-radius 0.35s var(--md-spring-fast); }
-  .expanded .rail-fab { width: calc(100% - 16px); }
+  .rail-fab { --inset: calc((var(--md-rail) - 80px) / 2); margin: 8px 0 16px var(--inset); width: 56px; overflow: hidden; transition: width 0.45s var(--md-spring-default), border-radius 0.35s var(--md-spring-fast); }
+  .expanded .rail-fab { width: calc(100% - 2 * var(--inset)); }
   .fab-label { white-space: nowrap; opacity: 0; transition: opacity 0.2s; }
   .expanded .fab-label { opacity: 1; }
 
@@ -166,7 +168,7 @@
   .badge { position: absolute; top: 2px; left: calc(50% + 8px); min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--md-error); color: var(--md-on-error); font: var(--md-label-small); display: grid; place-items: center; }
 
   .expanded .item { flex-direction: row; gap: 0; padding: 0; }
-  .expanded .indicator { width: 100%; height: 48px; justify-content: flex-start; padding-left: 16px; gap: 12px; display: flex; align-items: center; }
+  .expanded .indicator { width: 100%; height: var(--md-rail-item); justify-content: flex-start; padding-left: 16px; gap: 12px; display: flex; align-items: center; }
   .expanded .item .label { position: absolute; left: 56px; font: var(--md-label-large); }
   .expanded .badge { left: auto; right: 16px; top: 16px; }
 
@@ -180,12 +182,12 @@
   .body { min-width: 0; display: flex; flex-direction: column; }
   .topbar { display: none; align-items: center; gap: 8px; height: calc(64px + env(safe-area-inset-top)); padding: env(safe-area-inset-top) max(8px, env(safe-area-inset-right)) 0 max(8px, env(safe-area-inset-left)); position: sticky; top: 0; z-index: 10; background: var(--md-surface); }
   .spacer { flex: 1; }
-  main { position: relative; flex: 1; min-width: 0; background: var(--md-surface-container-lowest); border-radius: var(--md-shape-xl) 0 0 0; margin-top: 12px; }
+  main { position: relative; flex: 1; min-width: 0; background: var(--md-surface-container-lowest); border-radius: var(--md-card-shape) 0 0 0; margin-top: var(--md-main-gap); }
   :global([data-theme="dark"]) main { background: var(--md-surface-container-low); }
 
   .drawer-scrim { display: none; }
   @media (max-width: 1100px) {
-    .shell, .shell.expanded { grid-template-columns: 96px minmax(0, 1fr); }
+    .shell, .shell.expanded { grid-template-columns: var(--md-rail) minmax(0, 1fr); }
     .expanded .item { flex-direction: column; }
     .expanded .indicator { width: 56px; height: 32px; justify-content: center; padding: 0; }
     .expanded .item .label { position: static; font: var(--md-label-medium); }

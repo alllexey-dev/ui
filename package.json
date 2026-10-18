@@ -1,30 +1,71 @@
 {
   "name": "@alllexey/ui",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Material 3 Expressive design system for alllexey.dev projects: tokens, CSS components, web components and Svelte 5 components.",
   "license": "MIT",
   "type": "module",
-  "repository": { "type": "git", "url": "git+https://github.com/alllexey-dev/ui.git" },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alllexey-dev/ui.git"
+  },
   "homepage": "https://github.com/alllexey-dev/ui#readme",
-  "keywords": ["material-3", "material-expressive", "svelte", "design-system", "web-components"],
-  "sideEffects": ["**/*.css", "./dist/elements/index.js"],
+  "keywords": [
+    "material-3",
+    "material-expressive",
+    "svelte",
+    "design-system",
+    "web-components"
+  ],
+  "sideEffects": [
+    "**/*.css",
+    "./dist/elements/index.js"
+  ],
   "svelte": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
-    ".": { "types": "./dist/index.d.ts", "svelte": "./dist/index.js", "default": "./dist/index.js" },
-    "./chart": { "types": "./dist/components/Chart.svelte.d.ts", "svelte": "./dist/components/Chart.svelte", "default": "./dist/components/Chart.svelte" },
+    ".": {
+      "types": "./dist/index.d.ts",
+      "svelte": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./chart": {
+      "types": "./dist/components/Chart.svelte.d.ts",
+      "svelte": "./dist/components/Chart.svelte",
+      "default": "./dist/components/Chart.svelte"
+    },
     "./css": "./dist/styles/ui.css",
-    "./theme": { "types": "./dist/theme/index.d.ts", "default": "./dist/theme/index.js" },
-    "./shapes": { "types": "./dist/shapes.d.ts", "default": "./dist/shapes.js" },
-    "./elements": { "types": "./dist/elements/index.d.ts", "default": "./dist/elements/index.js" },
-    "./elements/svelte": { "types": "./dist/elements/svelte.d.ts" },
+    "./theme": {
+      "types": "./dist/theme/index.d.ts",
+      "default": "./dist/theme/index.js"
+    },
+    "./shapes": {
+      "types": "./dist/shapes.d.ts",
+      "default": "./dist/shapes.js"
+    },
+    "./elements": {
+      "types": "./dist/elements/index.d.ts",
+      "default": "./dist/elements/index.js"
+    },
+    "./elements/svelte": {
+      "types": "./dist/elements/svelte.d.ts"
+    },
     "./standalone/ui.js": "./dist/standalone/ui.js",
     "./standalone/ui.css": "./dist/standalone/ui.css",
     "./package.json": "./package.json"
   },
-  "publishConfig": { "access": "public" },
-  "bin": { "ui-theme": "./dist/bin/ui-theme.js" },
-  "files": ["dist", "README.md", "LICENSE", "UX.md", "CHANGELOG.md"],
+  "publishConfig": {
+    "access": "public"
+  },
+  "bin": {
+    "ui-theme": "./dist/bin/ui-theme.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "UX.md",
+    "CHANGELOG.md"
+  ],
   "scripts": {
     "dev": "vite --config docs/vite.config.ts",
     "build": "svelte-package -i src/lib -o dist && rm -rf dist/standalone && vite build --config vite.scheme.config.ts && vite build --config vite.standalone.config.ts && vite build --config vite.cli.config.ts",
@@ -40,8 +81,12 @@
     "uplot": "^1.6.30"
   },
   "peerDependenciesMeta": {
-    "uplot": { "optional": true },
-    "svelte": { "optional": true }
+    "uplot": {
+      "optional": true
+    },
+    "svelte": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@material/material-color-utilities": "0.4.0",

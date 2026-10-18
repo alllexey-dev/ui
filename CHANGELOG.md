@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.5.0
+
+### Added
+
+- Density tokens (`--md-control`, `--md-field`, `--md-row`, `--md-tab`, `--md-chip`, `--md-card-pad`,
+  `--md-card-shape`, `--md-page-pad`, `--md-page-title`, `--md-rail` and others) used by the CSS components,
+  `Page` and `AppShell`, and the compact density `<html data-density="compact">` for precise pointers:
+  controls 36px, fields and list rows 44px, tabs 40px, cards with 16px corners, smaller page titles and
+  paddings, an 80px rail. The default sizes do not change.
+
+### Fixed
+
+- `AppShell`: the rail hides its scrollbar, which took width from a short window's rail and pushed the items
+  off its axis; the menu button and the FAB are centred for any rail width.
+
 ## 0.4.0
 
 Collected from the apps that use the package (console, cringetrader, itmo-widgets-web, itmo-widgets-feedback):
